@@ -103,7 +103,7 @@ To add a new field to an existing block (ex. to first Page, on the first Block):
 
 ```rb
 block = Page.first.get_block 'text-1'
-block.create_item( 'ContentsCore::ItemString', 'test-1' ).set( 'A test...' ).save
+block.create_item( 'ContentsCore::ItemString', 'new-field' ).set( 'A test...' ).save
 ```
 
 Then add to the block view: `block.get( 'new-field' )`

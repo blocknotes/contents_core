@@ -83,7 +83,7 @@ module ContentsCore
         @_items = {}
         items.each { |item| @_items[item.name] = item }
       end
-      @_items[name]
+      @_items[name] ? @_items[name].data : nil
     end
 
     def has_parent?

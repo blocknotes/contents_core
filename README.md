@@ -34,9 +34,9 @@ conf = ContentsCore.config
 conf[:cc_blocks][:custom] = {
   name: 'Custom block',
   items: {
-    int1: :item_integer,
-    int2: :item_integer,
-    a_float: :item_float
+    title: :item_string,
+    content: :item_text,
+    image: :item_file
   }
 }
 ContentsCore.config( { components: conf[:cc_blocks] } )
@@ -44,15 +44,11 @@ ContentsCore.config( { components: conf[:cc_blocks] } )
 
 Create the new view blocks: `app/views/contents_core/_block_custom.html.erb`
 
-```erb
-<% if local_assigns[:block] %>
-  <% block = local_assigns[:block] %>
-  <div <%= block.editable %>>
-    1st number: <span class="num1"<%= block.props.integers[0].editable %>><%= block.props.integers[0] %></span>
-    - 2nd number: <span class="num2"<%= block.props.integers[1].editable %>><%= block.props.integers[1] %></span><br/>
-    A float: <span <%= block.props.float.editable %>><%= block.props.float %></span><br/>
-  </div>
-<% end %>
+```slim
+- if block
+  .title = block.get( 'title' )
+  .text == block.get( 'content' )
+  .image = image_tag block.get( 'image' ).url( :thumb )
 ```
 
 #### Images

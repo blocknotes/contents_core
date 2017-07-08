@@ -108,9 +108,9 @@ Page.first.cc_blocks.first.items.last.update_attribute( :data, 'A test' )
 
 #### Structure
 
-- Including the Editable concern to a model will add `has_many :ec_blocks` relationship (the list of blocks attached to a container) and some utility methods
+- Including the Blocks concern to a model will add `has_many :cc_blocks` relationship (the list of blocks attached to a container) and some utility methods
 
-- Block: an editable UI component (ex. a text with a title, a slider, a 3 column text widgets, etc.); built with a list of sub blocks (for nested components) and a list of items
+- Block: UI component, a group of items (ex. a text with a title, a slider, a 3 column text widgets, etc.); built with a list of sub blocks (for nested components) and a list of items
 
 - Item: a single piece of information (ex. a string, a text, a boolean, an integer, a file, etc.)
 

@@ -1,0 +1,5 @@
+<% block = local_assigns[:block] %>
+<% if block %>
+  <div class="title"<%= block.props.string.editable %>><%== block.props.string %></div>
+  <div class="content"<%= block.props.text.editable %>><%== block.props.text %></div>
+<% end %>

@@ -1,0 +1,7 @@
+<% if local_assigns[:block] %>
+  <% local_assigns[:block].ec_blocks.each do |sb| %>
+    <div class="sub-block" <%= sb.editable %>><%=
+      render partial: "contents_core/block_#{sb.block_type}", locals: { block: sb }
+    %></div>
+  <% end %>
+<% end %>

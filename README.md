@@ -20,9 +20,11 @@ Goals:
 - Copy migrations (Rails 5.x syntax, in Rails 4.x use `rake`):
 `rails contents_core:install:migrations`
 
-- Migrate
+- Execute migrations
 
 - Add the concern *Blocks* to your model (ex. *Page*): `include ContentsCore::Blocks`
+
+- Add the blocks to a view (ex. *page show*): `= render partial: 'contents_core/blocks', locals: { container: @page }`
 
 ### Config
 
@@ -49,13 +51,6 @@ Create the new view blocks: `app/views/contents_core/_block_custom.html.erb`
   .title = block.get( 'title' )
   .text == block.get( 'content' )
   .image = image_tag block.get( 'image' ).url( :thumb )
-```
-
-Page (parent model container) show:
-
-```slim
-- @page.current_blocks.each do |block|
-  = render partial: "blocks/block_#{block.block_type}", locals: { block: block }
 ```
 
 #### Images
@@ -99,6 +94,8 @@ end
 #### Custom blocks
 
 To create a "free form" block just use: `Page.first.create_block :intro, name: 'IntroBlock', schema: { intro: :item_string, subtitle: :item_string }`
+
+Then create a *app/view/contents_core/_block_intro* view.
 
 ### Dev Notes
 

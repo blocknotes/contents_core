@@ -1,0 +1,6 @@
+<% block = local_assigns[:block] %>
+<% if block %>
+  <% if block.props.file %>
+    <%= image_tag block.props.file.data, block.props.file.editable %>
+  <% end %>
+<% end %>

@@ -1,0 +1,11 @@
+<% if local_assigns[:container] %>
+  <div data-cc>
+    <% blocks = local_assigns[:container].current_blocks( params[:version] ) %>
+    <% if blocks %>
+      <div id="cc_blocks" <%= ContentsCore.editing ? "data-cc-blocks=#{blocks.length}" : '' %>><% blocks.each do |block| %><%= render partial: 'contents_core/block', locals: { block: block } %><%# yield blocks %><% end %></div>
+      <% if ContentsCore.editing %>
+        <div data-cc-new-blocks></div>
+      <% end %>
+    <% end %>
+  </div>
+<% end %>

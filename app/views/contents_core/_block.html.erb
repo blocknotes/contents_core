@@ -1,0 +1,6 @@
+<% if local_assigns[:block] %>
+  <% block = local_assigns[:block] %>
+  <div class="block-<%= block.block_type %>" <%= block.editable %>><%=
+    render partial: "contents_core/block_#{block.block_type}", locals: { block: block }
+  %></div>
+<% end %>

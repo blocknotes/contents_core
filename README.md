@@ -1,4 +1,4 @@
-# ContentsCore
+# ContentsCore [![Gem Version](https://badge.fury.io/rb/contents_core.svg)](https://badge.fury.io/rb/contents_core)
 
 A Rails gem which offer a simple structure to manage contents in a flexible way.
 

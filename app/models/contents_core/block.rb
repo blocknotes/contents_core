@@ -59,6 +59,13 @@ module ContentsCore
       ContentsCore.config[:cc_blocks][block_type.to_sym][:children_type]
     end
 
+    def create_item( item_type, item_name = nil )
+      new_item = ContentsCore::Item.new( type: item_type )
+      new_item.name = item_name if item_name
+      self.items << new_item
+      new_item
+    end
+
     def editable
       ContentsCore.editing ? (
         is_sub_block? ?

@@ -41,6 +41,11 @@ module ContentsCore
       @@item_types ||= ContentsCore.config[:items].keys.map &:to_s
     end
 
+    def set( value )
+      self.data = value
+      self
+    end
+
   protected
 
     def config

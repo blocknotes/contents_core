@@ -108,7 +108,7 @@ Page.first.cc_blocks.first.items.last.update_attribute( :data, 'A test' )
 
 - Blocks types: `ContentsCore::Block.block_types`
 
-- Default blocks (here)[https://github.com/blocknotes/contents_core/blob/master/config/initializers/contents_core.rb]
+- Default blocks [here](https://github.com/blocknotes/contents_core/blob/master/config/initializers/contents_core.rb)
 
 #### Structure
 

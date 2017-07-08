@@ -108,11 +108,15 @@ block.create_item( 'ContentsCore::ItemString', 'new-field' ).set( 'A test...' ).
 
 Then add to the block view: `block.get( 'new-field' )`
 
+#### ActiveAdmin
+
+If you use ActiveAdmin as admin interface you can find a sample model configuration [here](extra/activeadmin_page.rb)
+
 ### Notes
 
 - Blocks types: `ContentsCore::Block.block_types`
 
-- Default blocks [here](https://github.com/blocknotes/contents_core/blob/master/config/initializers/contents_core.rb)
+- Default blocks [here](config/initializers/contents_core.rb)
 
 #### Structure
 

@@ -22,7 +22,7 @@ Goals:
 
 - Migrate
 
-- Add the concern *Blocks* to your model: `include ContentsCore::Blocks`
+- Add the concern *Blocks* to your model (ex. *Page*): `include ContentsCore::Blocks`
 
 ### Config
 
@@ -49,6 +49,13 @@ Create the new view blocks: `app/views/contents_core/_block_custom.html.erb`
   .title = block.get( 'title' )
   .text == block.get( 'content' )
   .image = image_tag block.get( 'image' ).url( :thumb )
+```
+
+Page (parent model container) show:
+
+```slim
+- @page.current_blocks.each do |block|
+  = render partial: "blocks/block_#{block.block_type}", locals: { block: block }
 ```
 
 #### Images

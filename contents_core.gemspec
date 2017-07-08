@@ -9,14 +9,14 @@ Gem::Specification.new do |s|
   s.version     = ContentsCore::VERSION
   s.authors     = ["Mat"]
   s.email       = ["mat@blocknot.es"]
-  s.homepage    = "https://blocknot.es"
-  s.summary     = "CMS core structure"
-  s.description = "CMS core structure"
+  s.homepage    = "https://github.com/blocknotes/contents_core"
+  s.summary     = "Flexible contents structure for Rails"
+  s.description = "A Rails gem which offer a simple structure to manage contents in a flexible way"
   s.license     = "MIT"
 
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.md"]
 
-  # s.add_dependency "rails", "~> 5.1.2"
+  s.add_dependency "rails", "~> 5"
 
   # s.add_development_dependency "sqlite3"
 end

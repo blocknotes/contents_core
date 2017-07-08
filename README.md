@@ -6,11 +6,11 @@ _NOTE_: this is an **ALPHA** version, major changes could happens - this is a re
 
 Goals:
 
-- attach the necessary data to a model transparently
+- attach the contents structure to a model transparently
 
-- simplify the components development in views
+- improve block views management
 
-- add blocks / items (= fields) without migrations
+- add fields to blocks without migrations
 
 ### Install
 

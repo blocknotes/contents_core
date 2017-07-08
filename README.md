@@ -91,11 +91,18 @@ module ContentsCore
 end
 ```
 
-#### Custom blocks
+#### Customizations
 
 To create a "free form" block just use: `Page.first.create_block :intro, name: 'IntroBlock', schema: { intro: :item_string, subtitle: :item_string }`
 
 Then create a *app/view/contents_core/_block_intro* view.
+
+To add a new field to an existing block (ex. to first Page, on the first Block):
+
+```rb
+Page.first.cc_blocks.first.items << ContentsCore::ItemString.new( name: 'new_field' )
+Page.first.cc_blocks.first.items.last.update_attribute( :data, 'A test' )
+```
 
 ### Dev Notes
 

@@ -55,7 +55,7 @@ Create the new view blocks: `app/views/contents_core/_block_custom.html.erb`
 <% end %>
 ```
 
-##### Images
+#### Images
 
 To add support for images add CarrierWave gem to your Gemfile and execute: `rails generate uploader Image` and update che config file *config/initializers/contents_core.rb* with:
 
@@ -72,13 +72,34 @@ module ContentsCore
 end
 ```
 
-##### Custom blocks
+Another way is to override the *ItemFile* model (*app/models/contents_core/item_file.rb*):
+
+```rb
+module ContentsCore
+  class ItemFile < Item
+    mount_uploader :data_file, ImageUploader
+
+    alias_attribute :data, :data_file
+
+    def init
+      self.data_file = File.open( Rails.root.join( 'public', 'images', 'original', 'missing.jpg' ) )
+      self
+    end
+
+    def self.type_name
+      'file'
+    end
+  end
+end
+```
+
+#### Custom blocks
 
 To create a "free form" block just use: `Page.first.create_block :intro, name: 'IntroBlock', schema: { intro: :item_string, subtitle: :item_string }`
 
 ### Dev Notes
 
-##### Structure
+#### Structure
 
 - Including the Editable concern to a model will add `has_many :ec_blocks` relationship (the list of blocks attached to a container) and some utility methods
 

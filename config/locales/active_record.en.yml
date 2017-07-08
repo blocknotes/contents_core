@@ -8,11 +8,10 @@ en:
         one: Item
         other: Items
     attributes:
-      contents_core/block:
+      contents_core/item:
         column: Column
         content: Content
+        data: Data
         img: Image
         slide: Slide
         title: Title
-      contents_core/item:
-        data: Data

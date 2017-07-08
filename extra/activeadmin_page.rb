@@ -52,9 +52,9 @@ ActiveAdmin.register Page do
     frm.inputs "#{I18n.t('general.form.'+params[:action])} #{frm.object.model_name.human}" do
       frm.input :title
       frm.input :slug unless frm.object.new_record?
-      frm.has_many :cc_blocks, heading: false, sortable: :position, sortable_start: 1, new_record: 'Nuovo blocco' do |b|
+      frm.has_many :cc_blocks, heading: false, sortable: :position, sortable_start: 1, new_record: 'New block' do |b|
         b.input :name if b.object.new_record?
-        b.input :block_type, label: 'Tipo di blocco', hint: 'Salvare le modifiche per creare i campi del nuovo blocco', collection: ContentsCore::Block.block_types, input_html: { 'data-sel': 'items' + b.object.id.to_s } if b.object.new_record?
+        b.input :block_type, label: 'Type of block', hint: 'Save changes to edit the new block fields', collection: ContentsCore::Block.block_types, input_html: { 'data-sel': 'items' + b.object.id.to_s } if b.object.new_record?
         b.has_many :items, heading: b.object.name, new_record: false do |i|
           i.input :data, data_attrs( i.object )
         end unless b.object.new_record?
@@ -64,7 +64,7 @@ ActiveAdmin.register Page do
             bi.input :data, data_attrs( bi.object )
           end
         end unless b.object.new_record?
-        b.input :_destroy, label: 'Elimina blocco', required: false, as: :boolean, wrapper_html: { class: 'checkbox-destroy' } unless b.object.new_record?
+        b.input :_destroy, label: 'Destroy block', required: false, as: :boolean, wrapper_html: { class: 'checkbox-destroy' } unless b.object.new_record?
       end unless frm.object.new_record?
     end
     frm.actions

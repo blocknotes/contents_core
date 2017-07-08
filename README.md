@@ -104,7 +104,11 @@ Page.first.cc_blocks.first.items << ContentsCore::ItemString.new( name: 'new_fie
 Page.first.cc_blocks.first.items.last.update_attribute( :data, 'A test' )
 ```
 
-### Dev Notes
+### Notes
+
+- Blocks types: `ContentsCore::Block.block_types`
+
+- Default blocks (here)[https://github.com/blocknotes/contents_core/blob/master/config/initializers/contents_core.rb]
 
 #### Structure
 

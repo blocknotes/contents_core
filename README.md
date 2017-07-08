@@ -57,26 +57,16 @@ Create the new view blocks: `app/views/contents_core/_block_custom.html.erb`
 
 ##### Images
 
-To add support for images add CarrierWave gem to your Gemfile and execute: `rails generate uploader File` and mount it in the model *app/models/contents_core/item_file.rb*:
+To add support for images add CarrierWave gem to your Gemfile and execute: `rails generate uploader Image` and update che config file *config/initializers/contents_core.rb* with:
 
 ```rb
 module ContentsCore
-  class ItemFile < Item
+  ItemFile.class_eval do
     mount_uploader :data_file, ImageUploader
-
-    alias_attribute :data, :data_file
-
-    def editable
-      false
-    end
 
     def init
       self.data_file = File.open( Rails.root.join( 'public', 'images', 'original', 'missing.jpg' ) )
       self
-    end
-
-    def self.type_name
-      'file'
     end
   end
 end

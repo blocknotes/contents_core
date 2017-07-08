@@ -1,0 +1,18 @@
+en:
+  activerecord:
+    models:
+      contents_core/block:
+        one: Block
+        other: Blocks
+      contents_core/item:
+        one: Item
+        other: Items
+    attributes:
+      contents_core/block:
+        column: Column
+        content: Content
+        img: Image
+        slide: Slide
+        title: Title
+      contents_core/item:
+        data: Data

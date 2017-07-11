@@ -44,7 +44,7 @@ conf[:cc_blocks][:custom] = {
 ContentsCore.config( { components: conf[:cc_blocks] } )
 ```
 
-Create the new view blocks: `app/views/contents_core/_block_custom.html.erb`
+Create the new view blocks: `app/views/contents_core/_block_custom.html.slim`
 
 ```slim
 - if block
@@ -124,9 +124,9 @@ If you use ActiveAdmin as admin interface you can find a sample model configurat
 
 - Including the Blocks concern to a model will add `has_many :cc_blocks` relationship (the list of blocks attached to a container) and some utility methods
 
-- Block: UI component, a group of items (ex. a text with a title, a slider, a 3 column text widgets, etc.); built with a list of sub blocks (for nested components) and a list of items
+- Block: UI component, a group of items (ex. a text with a title, a slider, a 3 column text widget, etc.); built with a list of sub blocks (for nested components) and a list of items
 
-- Item: a single piece of information (ex. a string, a text, a boolean, an integer, a file, etc.)
+- Item: a single piece of information (ex. a string, a text, a boolean, an integer, a file, etc.) with a virtual method named *data*
 
 ## Contributors
 

@@ -108,6 +108,8 @@ block.create_item( 'ContentsCore::ItemString', 'new-field' ).set( 'A test...' ).
 
 Then add to the block view: `block.get( 'new-field' )`
 
+To set a field value: `block.set( 'new-field', 'Some value' )`
+
 #### ActiveAdmin
 
 If you use ActiveAdmin as admin interface you can find a sample model configuration [here](extra/activeadmin_page.rb)

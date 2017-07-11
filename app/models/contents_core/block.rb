@@ -152,6 +152,15 @@ module ContentsCore
       OpenStruct.new( pieces )
     end
 
+    def set( name, value )
+      items.each do |item|
+        if item.name == name
+          item.data = value
+          break
+        end
+      end
+    end
+
     def self.block_types
       @@block_types ||= ContentsCore.config[:cc_blocks].keys
     end

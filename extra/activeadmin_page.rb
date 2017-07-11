@@ -1,8 +1,16 @@
 def data_attrs( object )
   ret = {label: I18n.t("activerecord.attributes.contents_core/item.#{object.name}")}
   case object.class.to_s
+  when 'ContentsCore::ItemBoolean'
+    ret[:as] = :boolean
+  when 'ContentsCore::ItemDatetime'
+    ret[:as] = :date_select # :date_picker
   when 'ContentsCore::ItemFile'
     ret[:hint] = image_tag( object.data.url( :thumb ) )
+  when 'ContentsCore::ItemFloat', 'ContentsCore::ItemInteger'
+    ret[:as] = :number
+  # when 'ContentsCore::ItemHash'
+  #   ret[:as] = :hash
   when 'ContentsCore::ItemText'
     ret[:as] = :ckeditor
   end

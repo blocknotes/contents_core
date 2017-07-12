@@ -1,3 +1,9 @@
+ContentsCore::ItemHash.class_eval do
+  def data=( value )
+    self.from_string( value )
+  end
+end
+
 def data_attrs( object )
   ret = {label: I18n.t("activerecord.attributes.contents_core/item.#{object.name}")}
   case object.class.to_s
@@ -9,8 +15,9 @@ def data_attrs( object )
     ret[:hint] = image_tag( object.data.url( :thumb ) )
   when 'ContentsCore::ItemFloat', 'ContentsCore::ItemInteger'
     ret[:as] = :number
-  # when 'ContentsCore::ItemHash'
-  #   ret[:as] = :hash
+  when 'ContentsCore::ItemHash'
+    ret[:as] = :text
+    ret[:input_html] = {value: object.to_s}
   when 'ContentsCore::ItemText'
     ret[:as] = :ckeditor
   end

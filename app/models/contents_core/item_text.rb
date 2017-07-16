@@ -12,6 +12,10 @@ module ContentsCore
       self.save
     end
 
+    def self.permitted_attributes
+      [ :data_text ]
+    end
+
     def self.type_name
       'text'
     end

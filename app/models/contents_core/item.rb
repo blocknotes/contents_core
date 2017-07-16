@@ -28,6 +28,11 @@ module ContentsCore
       end
     end
 
+    def set( value )
+      self.data = value
+      self
+    end
+
     def to_s
       self.data
     end
@@ -41,9 +46,8 @@ module ContentsCore
       @@item_types ||= ContentsCore.config[:items].keys.map &:to_s
     end
 
-    def set( value )
-      self.data = value
-      self
+    def self.permitted_attributes
+      [ :data_boolean, :data_datetime, :data_file, :data_float, :data_hash, :data_integer, :data_string, :data_text ]
     end
 
   protected

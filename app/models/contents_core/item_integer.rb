@@ -16,6 +16,10 @@ module ContentsCore
       self.data.to_s
     end
 
+    def self.permitted_attributes
+      [ :data_integer ]
+    end
+
     def self.type_name
       'integer'
     end

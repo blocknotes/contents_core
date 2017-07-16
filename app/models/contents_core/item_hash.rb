@@ -24,6 +24,10 @@ module ContentsCore
       self.data_hash.inject( '' ) { |k, v| k + v[0] + ': ' + v[1] + "\n" }
     end
 
+    def self.permitted_attributes
+      [ :data_hash ]
+    end
+
     def self.type_name
       'hash'
     end

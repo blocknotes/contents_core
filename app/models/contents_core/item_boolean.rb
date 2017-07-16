@@ -16,6 +16,10 @@ module ContentsCore
       self.data > 0 ? 'true' : 'false'
     end
 
+    def self.permitted_attributes
+      [ :data_boolean ]
+    end
+
     def self.type_name
       'boolean'
     end

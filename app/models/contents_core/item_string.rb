@@ -22,6 +22,10 @@ module ContentsCore
       self.save
     end
 
+    def self.permitted_attributes
+      [ :data_string ]
+    end
+
     def self.type_name
       'string'
     end

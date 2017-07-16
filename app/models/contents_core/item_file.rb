@@ -20,6 +20,10 @@ module ContentsCore
       self
     end
 
+    def self.permitted_attributes
+      [ :data_file ]
+    end
+
     def self.type_name
       'file'
     end

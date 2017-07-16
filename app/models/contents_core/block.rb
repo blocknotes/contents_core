@@ -182,5 +182,9 @@ module ContentsCore
         end
       end if items
     end
+
+    def self.permitted_attributes
+      [ :id, :name, items_attributes: [ :id ] + Item::permitted_attributes ]
+    end
   end
 end

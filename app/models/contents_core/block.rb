@@ -184,7 +184,7 @@ module ContentsCore
     end
 
     def self.permitted_attributes
-      [ :id, :name, items_attributes: [ :id ] + Item::permitted_attributes ]
+      [ :id, :name, :block_type, :position, :_destroy, items_attributes: [ :id ] + Item::permitted_attributes, cc_blocks_attributes: [ :id, :name, :block_type, items_attributes: [ :id ] + Item::permitted_attributes ] ]
     end
   end
 end

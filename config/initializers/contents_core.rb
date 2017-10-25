@@ -56,6 +56,7 @@ module ContentsCore
         input: :file_image
       },
       integer: {},
+      object: {},
       string: {},
       text: {
         input: :html

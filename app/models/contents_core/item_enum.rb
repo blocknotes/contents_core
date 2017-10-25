@@ -18,7 +18,7 @@ module ContentsCore
     end
 
     def self.permitted_attributes
-      [ :data_string ]
+      [:data_string, :data_hash]
     end
 
     def self.type_name

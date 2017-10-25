@@ -1,8 +1,9 @@
+# TODO: needs improvements
 module ContentsCore
-  class ItemHash < Item
+  class ItemObject < Item
     alias_attribute :data, :data_hash
 
-    serialize :data_hash, Hash
+    serialize :data_hash, JSON
 
     def init
       self.data = {}
@@ -20,15 +21,6 @@ module ContentsCore
       end
     end
 
-    def method_missing( method, *args, &block )
-      matches = /data_(.+)=/.match method.to_s
-      self.data[matches[1]] = args[0] if matches[1]
-    end
-
-    def respond_to?( method, include_private = false )
-      method.to_s.starts_with?( 'data_' ) || super
-    end
-
     def to_s
       self.data_hash ? self.data_hash.inject( '' ) { |k, v| k + v[0] + ': ' + v[1] + "\n" } : {}
     end
@@ -38,7 +30,7 @@ module ContentsCore
     end
 
     def self.type_name
-      'hash'
+      'object'
     end
   end
 end

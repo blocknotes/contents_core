@@ -2,8 +2,6 @@
 
 A Rails gem which offer a simple structure to manage contents in a flexible way.
 
-_NOTE_: this is an **ALPHA** version, major changes could happens - this is a refactoring of another gem of mine (editable_components)
-
 Goals:
 
 - attach the contents structure to a model transparently

@@ -160,6 +160,10 @@ module ContentsCore
       end
     end
 
+    def self.block_list
+      @@block_list ||= ContentsCore.config[:cc_blocks].map{|k, v| [v[:name], k.to_s]}.sort_by{|b| b[0]}
+    end
+
     def self.block_types
       @@block_types ||= ContentsCore.config[:cc_blocks].keys
     end

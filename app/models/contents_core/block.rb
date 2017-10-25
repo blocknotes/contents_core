@@ -56,7 +56,7 @@ module ContentsCore
     end
 
     def children_type
-      ContentsCore.config[:cc_blocks][block_type.to_sym][:children_type]
+      config[:children_type]
     end
 
     def create_item( item_type, item_name = nil )
@@ -107,8 +107,7 @@ module ContentsCore
 
     def on_after_create
       # TODO: validates type before creation!
-      t = self.block_type.to_sym
-      Block::init_items( self, ContentsCore.config[:cc_blocks][t][:items] ) if Block::block_types.include?( t )
+      Block::init_items( self, config[:items] ) if Block::block_types.include?( self.block_type.to_sym )
     end
 
     def on_before_create
@@ -185,6 +184,10 @@ module ContentsCore
 
     def self.permitted_attributes
       [ :id, :name, :block_type, :position, :_destroy, items_attributes: [ :id ] + Item::permitted_attributes, cc_blocks_attributes: [ :id, :name, :block_type, items_attributes: [ :id ] + Item::permitted_attributes ] ]
+    end
+
+    def config
+      @config ||= ContentsCore.config[:cc_blocks][block_type.to_sym] ? ContentsCore.config[:cc_blocks][block_type.to_sym] : {}
     end
   end
 end

@@ -104,7 +104,7 @@ To set a field value: `block.set( 'new-field', 'Some value' )`
 
 #### ActiveAdmin
 
-If you use ActiveAdmin as admin interface you can find a sample model configuration [here](extra/activeadmin_page.rb)
+If you use ActiveAdmin as admin interface you can find a sample model configuration: [page](extra/active_admin_page.rb) plus a js [page](extra/active_admin.js)
 
 ### Notes
 

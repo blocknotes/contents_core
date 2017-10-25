@@ -111,6 +111,7 @@ module ContentsCore
     end
 
     def on_before_create
+      self.group = config[:group]
       if self.name.blank?
         names = parent.cc_blocks.map &:name
         i = 0

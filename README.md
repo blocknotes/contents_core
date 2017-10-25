@@ -7,23 +7,17 @@ _NOTE_: this is an **ALPHA** version, major changes could happens - this is a re
 Goals:
 
 - attach the contents structure to a model transparently
-
 - improve block views management
-
 - add fields to blocks without migrations
 
 ### Install
 
 - Add to the Gemfile:
 `gem 'contents_core'`
-
 - Copy migrations (Rails 5.x syntax, in Rails 4.x use `rake`):
 `rails contents_core:install:migrations`
-
 - Execute migrations
-
 - Add the concern *Blocks* to your model (ex. *Page*): `include ContentsCore::Blocks`
-
 - Add the blocks to a view (ex. *page show*): `= render partial: 'contents_core/blocks', locals: { container: @page }`
 
 ### Config
@@ -116,16 +110,14 @@ If you use ActiveAdmin as admin interface you can find a sample model configurat
 
 ### Notes
 
+- Blocks list (enum): `ContentsCore::Block.block_list`
 - Blocks types: `ContentsCore::Block.block_types`
-
 - Default blocks [here](config/initializers/contents_core.rb)
 
 #### Structure
 
 - Including the Blocks concern to a model will add `has_many :cc_blocks` relationship (the list of blocks attached to a container) and some utility methods
-
 - Block: UI component, a group of items (ex. a text with a title, a slider, a 3 column text widget, etc.); built with a list of sub blocks (for nested components) and a list of items
-
 - Item: a single piece of information (ex. a string, a text, a boolean, an integer, a file, etc.) with a virtual method named *data*
 
 ## Contributors

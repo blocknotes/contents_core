@@ -49,6 +49,7 @@ module ContentsCore
     items: {
       boolean: {},
       datetime: {},
+      enum: {},
       float: {},
       hash: {},
       file: {

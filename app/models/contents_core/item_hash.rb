@@ -9,6 +9,10 @@ module ContentsCore
       self
     end
 
+    def keys
+      config[:keys] ? config[:keys] : self.data_hash.keys
+    end
+
     def from_string( value )
       if value.is_a? String
         val = {}

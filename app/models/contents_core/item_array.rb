@@ -5,7 +5,7 @@ module ContentsCore
     serialize :data_hash, Array
 
     def enum
-      config[:values] ? config[:values] : self.data_hash
+      config[:values] ? config[:values] : ( config[:values_method] ? config[:values_method].call : self.data_hash )
     end
 
     def init

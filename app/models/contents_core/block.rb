@@ -130,6 +130,7 @@ module ContentsCore
 
     def on_before_create
       self.group = config[:group]
+      self.block_type = parent.config[:children_type] if self.parent_type == 'ContentsCore::Block'
       if self.name.blank?
         names = parent.cc_blocks.map &:name
         i = 0
@@ -180,7 +181,7 @@ module ContentsCore
     end
 
     def self.block_list
-      @@block_list ||= ContentsCore.config[:cc_blocks].map{|k, v| [v[:name], k.to_s]}.sort_by{|b| b[0]}
+      @@block_list ||= ContentsCore.config[:cc_blocks].map{|k, v| [v[:name], k.to_s] unless v[:child_only]}.compact.sort_by{|b| b[0]}
     end
 
     def self.block_types
@@ -210,7 +211,8 @@ module ContentsCore
     end
 
     def config
-      @config ||= ContentsCore.config[:cc_blocks][block_type.to_sym] ? ContentsCore.config[:cc_blocks][block_type.to_sym] : {}
+      # @config ||=
+      ContentsCore.config[:cc_blocks][block_type.to_sym] ? ContentsCore.config[:cc_blocks][block_type.to_sym] : {}
     end
   end
 end

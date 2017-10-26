@@ -1,11 +1,15 @@
-ContentsCore::ItemObject.class_eval do
-  def data=( value )
-    self.from_string( value )
-  end
+# ContentsCore::ItemObject.class_eval do
+#   def data=( value )
+#     self.from_string( value )
+#   end
+# end
+
+ContentsCore::ItemFile.class_eval do
+  mount_uploader :data_file, ImageUploader
 end
 
 def data_attrs( object )
-  ret = {label: I18n.t("activerecord.attributes.contents_core/item.#{object.name}")}
+  ret = {label: I18n.t("activerecord.attributes.contents_core/item.#{object.name}"), input_html:{'data-cc-class': object.class.to_s}}
   case object.class.to_s
   when 'ContentsCore::ItemArray'
     ret[:as] = :select
@@ -15,7 +19,7 @@ def data_attrs( object )
   when 'ContentsCore::ItemDatetime'
     ret[:as] = :date_select # :date_picker
   when 'ContentsCore::ItemFile'
-    ret[:hint] = image_tag( object.data.url( :thumb ) )
+    ret[:hint] = image_tag( object.data.url ) if object.data?
   when 'ContentsCore::ItemFloat', 'ContentsCore::ItemInteger'
     ret[:as] = :number
   when 'ContentsCore::ItemText'
@@ -84,7 +88,7 @@ ActiveAdmin.register Page do
             i.input :data, data_attrs( i.object )
           end
         end unless b.object.new_record?
-        b.has_many :cc_blocks, heading: false, new_record: b.object.has_children? do |bb|
+        b.has_many :cc_blocks, heading: false, new_record: b.object.config[:children_type] do |bb|
           bb.input :name if bb.object.new_record?
           bb.has_many :items, heading: bb.object.name, new_record: false do |bi|
             if bi.object.is_a? ContentsCore::ItemHash
@@ -95,6 +99,7 @@ ActiveAdmin.register Page do
               bi.input :data, data_attrs( bi.object )
             end
           end
+          bb.input :_destroy, label: 'Destroy sub block', required: false, as: :boolean, wrapper_html: { class: 'checkbox-destroy' }
         end unless b.object.new_record?
         b.input :_destroy, label: 'Destroy block', required: false, as: :boolean, wrapper_html: { class: 'checkbox-destroy' } unless b.object.new_record?
       end unless frm.object.new_record?

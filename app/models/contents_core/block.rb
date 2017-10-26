@@ -95,11 +95,16 @@ module ContentsCore
 
     # Returns an item by name
     def get( name )
+      item = get_item( name )
+      item.data if item
+    end
+
+    def get_item( name )
       unless @_items
         @_items = {}
         items.each { |item| @_items[item.name] = item }
       end
-      @_items[name] ? @_items[name].data : nil
+      @_items[name]
     end
 
     def has_parent?

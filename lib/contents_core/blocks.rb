@@ -8,13 +8,7 @@ module ContentsCore
       accepts_nested_attributes_for :cc_blocks, allow_destroy: true
 
       def create_block( type = :text, params = {} )
-        block = Block.new( block_type: type )
-        block.name = params[:name] if params[:name]
-        block.options = params[:options] if params[:options]
-        block.validations = params[:validations] if params[:validations]
-        cc_blocks << block
-        Block::init_items block, params[:schema] if params[:schema]
-        block
+        ContentsCore::create_block_in_parent( self, type, params )
       end
 
       def current_blocks( version = 0 )

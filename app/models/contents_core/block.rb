@@ -51,8 +51,17 @@ module ContentsCore
     #
     # # scope :published, -> { where( published: true ) unless ApplicationController.edit_mode }
 
+    def as_json
+      # binding.pry
+      super({ only: [:id, :block_type, :name, :group, :position, :published], methods: [:blocks_collection, :items_collection]}.merge(options || {}))
+    end
+
     def attr_id
       "#{self.class.to_s.split('::').last}-#{self.id}"
+    end
+
+    def blocks_collection
+      self.cc_blocks.map &:as_json
     end
 
     def children_type
@@ -103,6 +112,10 @@ module ContentsCore
 
     def is_sub_block?
       parent.present? && parent_type == 'ContentsCore::Block'
+    end
+
+    def items_collection
+      self.items.map &:as_json
     end
 
     def on_after_create

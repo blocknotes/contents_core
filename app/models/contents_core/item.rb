@@ -6,6 +6,10 @@ module ContentsCore
 
     belongs_to :block
 
+    def as_json
+      super( {only: [:id, :name, :type], methods: [:data]} )
+    end
+
     def attr_id
       "#{self.class_name}-#{self.id}"
     end

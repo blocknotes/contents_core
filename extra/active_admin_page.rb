@@ -78,7 +78,7 @@ ActiveAdmin.register Page do
         b.has_many :items, heading: b.object.name, new_record: false do |i|
           if i.object.is_a? ContentsCore::ItemHash
             i.object.keys.each do |key|
-              i.input :data, as: :string, label: I18n.t("activerecord.attributes.contents_core/item.#{i.object.name}.#{key}"), input_html: {id: nil, 'data-hash-key': key, value: i.object.data[key]}
+              i.input :data, as: :string, label: I18n.t("activerecord.attributes.contents_core/item.#{i.object.name}.#{key}"), input_html: {id: nil, 'data-hash-key': key, value: i.object.data[key.to_s]}
             end
           else
             i.input :data, data_attrs( i.object )
@@ -89,7 +89,7 @@ ActiveAdmin.register Page do
           bb.has_many :items, heading: bb.object.name, new_record: false do |bi|
             if bi.object.is_a? ContentsCore::ItemHash
               bi.object.keys.each do |key|
-                bi.input :data, as: :string, label: I18n.t("activerecord.attributes.contents_core/item.#{bi.object.name}.#{key}"), input_html: {id: nil, 'data-hash-key': key, value: bi.object.data[key]}
+                bi.input :data, as: :string, label: I18n.t("activerecord.attributes.contents_core/item.#{bi.object.name}.#{key}"), input_html: {id: nil, 'data-hash-key': key, value: bi.object.data[key.to_s]}
               end
             else
               bi.input :data, data_attrs( bi.object )

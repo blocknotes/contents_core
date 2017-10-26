@@ -1,4 +1,4 @@
-ContentsCore::ItemHash.class_eval do
+ContentsCore::ItemObject.class_eval do
   def data=( value )
     self.from_string( value )
   end
@@ -7,13 +7,13 @@ end
 def data_attrs( object )
   ret = {label: I18n.t("activerecord.attributes.contents_core/item.#{object.name}")}
   case object.class.to_s
+  when 'ContentsCore::ItemArray'
+    ret[:as] = :select
+    ret[:collection] = object.enum
   when 'ContentsCore::ItemBoolean'
     ret[:as] = :boolean
   when 'ContentsCore::ItemDatetime'
     ret[:as] = :date_select # :date_picker
-  when 'ContentsCore::ItemEnum'
-    ret[:as] = :select
-    ret[:collection] = object.enum
   when 'ContentsCore::ItemFile'
     ret[:hint] = image_tag( object.data.url( :thumb ) )
   when 'ContentsCore::ItemFloat', 'ContentsCore::ItemInteger'

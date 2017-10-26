@@ -1,5 +1,5 @@
 module ContentsCore
-  class ItemEnum < Item
+  class ItemArray < Item
     alias_attribute :data, :data_string
 
     serialize :data_hash, Array
@@ -22,7 +22,7 @@ module ContentsCore
     end
 
     def self.type_name
-      'enum'
+      'array'
     end
   end
 end

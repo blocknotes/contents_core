@@ -47,9 +47,9 @@ module ContentsCore
       },
     },
     items: {
+      array: {},
       boolean: {},
       datetime: {},
-      enum: {},
       float: {},
       hash: {},
       file: {

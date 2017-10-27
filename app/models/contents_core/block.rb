@@ -51,6 +51,12 @@ module ContentsCore
     #
     # # scope :published, -> { where( published: true ) unless ApplicationController.edit_mode }
 
+    def initialize( params = {} )
+      super
+      self.group = config[:group]
+      self.block_type = parent.config[:children_type] if params[:block_type].nil? && self.parent_type == 'ContentsCore::Block'
+    end
+
     def as_json
       # binding.pry
       super({ only: [:id, :block_type, :name, :group, :position, :published], methods: [:blocks_collection, :items_collection]}.merge(options || {}))
@@ -129,8 +135,6 @@ module ContentsCore
     end
 
     def on_before_create
-      self.group = config[:group]
-      self.block_type = parent.config[:children_type] if self.parent_type == 'ContentsCore::Block'
       if self.name.blank?
         names = parent.cc_blocks.map &:name
         i = 0
@@ -211,7 +215,6 @@ module ContentsCore
     end
 
     def config
-      # @config ||=
       ContentsCore.config[:cc_blocks][block_type.to_sym] ? ContentsCore.config[:cc_blocks][block_type.to_sym] : {}
     end
   end

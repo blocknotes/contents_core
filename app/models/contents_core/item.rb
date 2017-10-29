@@ -6,8 +6,8 @@ module ContentsCore
 
     belongs_to :block
 
-    def as_json
-      super( {only: [:id, :name, :type], methods: [:data]} )
+    def as_json( options = nil )
+      super( {only: [:id, :name, :type], methods: [:data]}.merge(options || {}) )
     end
 
     def attr_id
@@ -32,6 +32,10 @@ module ContentsCore
       end
     end
 
+    def process_data( args = nil )
+      config[:process_data].call( self.data, args ) if config[:process_data]
+    end
+
     def set( value )
       self.data = value
       self
@@ -47,7 +51,7 @@ module ContentsCore
     end
 
     def self.item_types
-      @@item_types ||= ContentsCore.config[:items].keys.map &:to_s
+      @@item_types ||= ContentsCore.config[:items].keys.map( &:to_s )
     end
 
     def self.permitted_attributes
@@ -57,7 +61,47 @@ module ContentsCore
   protected
 
     def config
-      @config ||= self.block.config[:options] && self.block.config[:options][self.name.to_sym] ? self.block.config[:options][self.name.to_sym] : ( ContentsCore.config[:items][self.class::type_name.to_sym] ? ContentsCore.config[:items][self.class::type_name.to_sym] : {} )
+      @config ||= self.block && self.block.config[:options] && self.block.config[:options][self.name.to_sym] ? self.block.config[:options][self.name.to_sym] : ( ContentsCore.config[:items][self.class::type_name.to_sym] ? ContentsCore.config[:items][self.class::type_name.to_sym] : {} )
+    end
+
+    def convert_data( value )
+      # return ( data = config[:convert_method].call( data ) ) if config[:convert_method]
+      if config[:data_type]
+        case config[:data_type].to_sym
+        when :boolean
+          self.data_boolean = ( value == 1 ) || ( value == '1' ) || ( value == 'true' ) || ( value == 'yes' )
+        when :float
+          self.data_float = value.to_f
+        when :integer
+          self.data_integer = value.to_i
+        when :string
+          self.data_string = value.to_s
+        when :text
+          self.data_text = value.to_s
+        else
+          return false
+        end
+        true
+      else
+        false
+      end
+    end
+
+    def converted_data
+      if config[:data_type]
+        case config[:data_type].to_sym
+        when :boolean
+          self.data_boolean
+        when :float
+          self.data_float
+        when :integer
+          self.data_integer
+        when :string
+          self.data_string
+        when :text
+          self.data_text
+        end
+      end
     end
   end
 end

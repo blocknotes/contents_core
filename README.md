@@ -108,7 +108,7 @@ If you use ActiveAdmin as admin interface you can find a sample model configurat
 
 ### Notes
 
-- Blocks list (enum): `ContentsCore::Block.block_list`
+- Blocks enum: `ContentsCore::Block.block_enum`
 - Blocks types: `ContentsCore::Block.block_types`
 - Default blocks [here](config/initializers/contents_core.rb)
 

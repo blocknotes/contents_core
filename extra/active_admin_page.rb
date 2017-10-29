@@ -54,6 +54,17 @@ ActiveAdmin.register Page do
       params.permit!  # TODO: permits all for now
     end
 
+    def save_resource( object )
+      if params[:add_block]
+        # params[:save_and_edit] = true
+        object.create_block params[:add_block].keys[0].to_sym
+      else
+        run_save_callbacks object do
+          object.save
+        end
+      end
+    end
+
     def update
       super do |format|
         redirect_to collection_url and return if resource.valid?
@@ -76,6 +87,13 @@ ActiveAdmin.register Page do
       frm.input :title
       frm.input :author
       frm.input :slug unless frm.object.new_record?
+
+      li class: 'block-buttons' do
+        ContentsCore::Block::block_types.each do |type|
+          frm.button "Create #{type}", name: "add_block[#{type}]"
+        end
+      end unless frm.object.new_record?
+
       frm.has_many :cc_blocks, heading: false, sortable: :position, sortable_start: 1, new_record: 'New block' do |b|
         b.input :name if b.object.new_record?
         b.input :block_type, label: 'Type of block', hint: 'Save changes to edit the new block fields', collection: ContentsCore::Block.block_list, input_html: { 'data-sel': 'items' + b.object.id.to_s } if b.object.new_record?

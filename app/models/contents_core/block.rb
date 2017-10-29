@@ -2,6 +2,8 @@ module ContentsCore
   class Block < ApplicationRecord
     EMPTY_DATA = OpenStruct.new( { data: '' } )
 
+    attr_accessor :create_children
+
     # --- fields options ----------------------------------------------------- #
     serialize :options, JSON
     serialize :validations, JSON
@@ -51,27 +53,27 @@ module ContentsCore
     #
     # # scope :published, -> { where( published: true ) unless ApplicationController.edit_mode }
 
-    def initialize( params = {} )
-      super
+    def initialize( attributes = {}, &block )
+      super( attributes, &block )
+      @create_children = 1
       self.group = config[:group]
-      self.block_type = parent.config[:children_type] if params[:block_type].nil? && self.parent_type == 'ContentsCore::Block'
+      self.block_type = parent.config[:children_type] if attributes[:block_type].nil? && self.parent_type == 'ContentsCore::Block'
     end
 
-    def as_json
-      # binding.pry
-      super({ only: [:id, :block_type, :name, :group, :position, :published], methods: [:blocks_collection, :items_collection]}.merge(options || {}))
+    def as_json( options = nil )
+      super({ only: [:id, :block_type, :name, :group, :position, :published], include: [:cc_blocks, :items]}.merge(options || {}))
     end
 
     def attr_id
       "#{self.class.to_s.split('::').last}-#{self.id}"
     end
 
-    def blocks_collection
-      self.cc_blocks.map &:as_json
-    end
-
     def children_type
       config[:children_type]
+    end
+
+    def config
+      ContentsCore.config[:cc_blocks][block_type.to_sym] ? ContentsCore.config[:cc_blocks][block_type.to_sym] : {}
     end
 
     def create_item( item_type, item_name = nil )
@@ -125,18 +127,14 @@ module ContentsCore
       parent.present? && parent_type == 'ContentsCore::Block'
     end
 
-    def items_collection
-      self.items.map &:as_json
-    end
-
     def on_after_create
       # TODO: validates type before creation!
-      Block::init_items( self, config[:items] ) if Block::block_types.include?( self.block_type.to_sym )
+      Block::init_items( self, config[:items] ) if Block::block_types( false ).include?( self.block_type.to_sym )
     end
 
     def on_before_create
       if self.name.blank?
-        names = parent.cc_blocks.map &:name
+        names = parent.cc_blocks.map( &:name )
         i = 0
         while( ( i += 1 ) < 1000 )  # Search an empty group
           unless names.include? "#{block_type}-#{i}"
@@ -184,15 +182,15 @@ module ContentsCore
       end
     end
 
-    def self.block_list
-      @@block_list ||= ContentsCore.config[:cc_blocks].map{|k, v| [v[:name], k.to_s] unless v[:child_only]}.compact.sort_by{|b| b[0]}
+    def self.block_enum( include_children = true )
+      ContentsCore.config[:cc_blocks].map{|k, v| [v[:name], k.to_s] if !include_children || !v[:child_only]}.compact.sort_by{|b| b[0]}
     end
 
-    def self.block_types
-      @@block_types ||= ContentsCore.config[:cc_blocks].keys
+    def self.block_types( include_children = true )
+      ContentsCore.config[:cc_blocks].select{|k, v| !include_children || !v[:child_only]}.keys
     end
 
-    def self.init_items( block, items )
+    def self.init_items( block, items, options = {} )
       items.each do |name, type|
         t = type.to_sym
         if type.to_s.start_with? 'item_'
@@ -204,18 +202,16 @@ module ContentsCore
             model = false
           end
           block.items << model.new( name: name ).init if model
-        elsif Block::block_types.include? t.to_sym
-          block.cc_blocks << ( cmp = Block.new( block_type: t, name: name ) )
+        elsif Block::block_types( false ).include? t.to_sym
+          block.create_children.times do
+            block.cc_blocks << Block.new( block_type: t, name: name )
+          end
         end
       end if items
     end
 
     def self.permitted_attributes
       [ :id, :name, :block_type, :position, :_destroy, items_attributes: [ :id ] + Item::permitted_attributes, cc_blocks_attributes: [ :id, :name, :block_type, items_attributes: [ :id ] + Item::permitted_attributes ] ]
-    end
-
-    def config
-      ContentsCore.config[:cc_blocks][block_type.to_sym] ? ContentsCore.config[:cc_blocks][block_type.to_sym] : {}
     end
   end
 end

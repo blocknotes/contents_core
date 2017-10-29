@@ -12,8 +12,9 @@ module ContentsCore
     block.name = params[:name] if params[:name]
     block.options = params[:options] if params[:options]
     block.validations = params[:validations] if params[:validations]
+    block.create_children = params[:create_children].to_i if params[:create_children]
     parent.cc_blocks << block
-    Block::init_items block, params[:schema] if params[:schema]
+    Block::init_items block, params[:schema], {create_children: params[:create_children]} if params[:schema]
     block
   end
 

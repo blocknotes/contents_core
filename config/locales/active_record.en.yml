@@ -8,6 +8,13 @@ en:
         one: Item
         other: Items
     attributes:
+      contents_core/block:
+        image: Image
+        multi_text: Text Only
+        slide: Slide
+        slider: Slider
+        text: Text Only
+        text_with_image: Text with Image
       contents_core/item:
         column: Column
         content: Content

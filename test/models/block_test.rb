@@ -7,10 +7,6 @@ module ContentsCore
       @page = Page.create title: 'Homepage', description: 'This is the homepage'
     end
 
-    # test 'the truth' do
-    #   assert true
-    # end
-
     # --- Create tests ---
     test 'should create a text block with default options' do
       assert Block.new( parent: @page ).save

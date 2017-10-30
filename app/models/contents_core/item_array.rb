@@ -3,9 +3,9 @@ module ContentsCore
     serialize :data_hash, Array
     serialize :data_text, Array
 
-    after_initialize do
-      config[:data_type] ||= :integer
-    end
+    # after_initialize do
+    #   config[:data_type] ||= :integer  # TODO: this overrides the config !
+    # end
 
     def data
       is_multiple? ? self.data_text : converted_data

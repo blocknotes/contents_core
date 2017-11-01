@@ -33,14 +33,15 @@ module ContentsCore
     end
 
     test 'should create a datetime item' do
-      dt = ( DateTime.now - 1440 ).change( offset: '+0000' )
+      dt = Time.zone.now
       item = @page.create_block.create_item 'ContentsCore::ItemDatetime', 'a-block'
       item.set dt
       item.save
       item = ItemDatetime.find_by name: 'a-block'
-      data = item.read_attribute( :data_datetime ).to_datetime.change( offset: '+0000' )
+      data = item.read_attribute( :data_datetime )
       assert_equal data, dt
       assert_equal item.data, dt  # test alias
+      assert_equal data.class, ActiveSupport::TimeWithZone
     end
 
     test 'should create a file item' do

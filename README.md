@@ -2,8 +2,9 @@
 
 A Rails gem which offer a simple structure to manage contents in a flexible way.
 
-Goals:
+Disclaimer: this component is in ALPHA, major changes could happen
 
+Goals:
 - attach the contents structure to a model transparently
 - improve block views management
 - add fields to blocks without migrations

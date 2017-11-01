@@ -38,7 +38,7 @@ module ContentsCore
       item.set dt
       item.save
       item = ItemDatetime.find_by name: 'a-block'
-      data = item.read_attribute( :data_datetime ).to_datetime
+      data = item.read_attribute( :data_datetime ).to_datetime.change( offset: '+0000' )
       assert_equal data, dt
       assert_equal item.data, dt  # test alias
     end

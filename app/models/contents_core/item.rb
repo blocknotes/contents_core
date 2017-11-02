@@ -58,49 +58,52 @@ module ContentsCore
       [ :data_boolean, :data_datetime, :data_file, :data_float, :data_hash, :data_integer, :data_string, :data_text ]
     end
 
-  protected
-
     def config
       @config ||= self.block && self.block.config[:options] && self.block.config[:options][self.name.to_sym] ? self.block.config[:options][self.name.to_sym] : ( ContentsCore.config[:items][self.class::type_name.to_sym] ? ContentsCore.config[:items][self.class::type_name.to_sym] : {} )
     end
 
+    def data_type
+      @data_type ||= ( config[:data_type] || :string ).to_sym
+    end
+
+  protected
+
     def convert_data( value )
       # return ( data = config[:convert_method].call( data ) ) if config[:convert_method]
-      if config[:data_type]
-        case config[:data_type].to_sym
+      if data_type
+        case data_type
         when :boolean
           self.data_boolean = ( value == 1 ) || ( value == '1' ) || ( value == 'true' ) || ( value == 'yes' )
         when :float
           self.data_float = value.to_f
         when :integer
           self.data_integer = value.to_i
-        when :string
-          self.data_string = value.to_s
         when :text
           self.data_text = value.to_s
-        else
-          return false
+        else  # :string or other
+          self.data_string = value.to_s
         end
-        true
-      else
-        false
+      else  # :string or other
+        self.data_string = value.to_s
       end
     end
 
-    def converted_data
-      if config[:data_type]
-        case config[:data_type].to_sym
+    def converted_data()
+      if data_type
+        case data_type
         when :boolean
           self.data_boolean
         when :float
           self.data_float
         when :integer
           self.data_integer
-        when :string
-          self.data_string
         when :text
           self.data_text
+        else  # :string or other
+          self.data_string
         end
+      else  # :string or other
+        self.data_string
       end
     end
   end

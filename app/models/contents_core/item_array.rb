@@ -13,8 +13,8 @@ module ContentsCore
 
     def data=( value )
       if is_multiple?
-        if config[:data_type]
-          self.data_text = case config[:data_type].to_sym
+        if data_type
+          self.data_text = case data_type
             # when :boolean
             #   self.data_boolean = ( value == 1 ) || ( value == '1' ) || ( value == 'true' ) || ( value == 'yes' )
             when :float
@@ -32,6 +32,10 @@ module ContentsCore
       else
         convert_data( value )
       end
+    end
+
+    def data_type
+      @data_type ||= ( config[:data_type] || :integer ).to_sym
     end
 
     def enum( params = nil )

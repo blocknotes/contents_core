@@ -16,9 +16,31 @@ module ContentsCore
       assert_equal item.name, 'a-block'
     end
 
-    # test 'should create an array item' do
+    test 'should create an array item' do
+      item = @page.create_block.create_item 'ContentsCore::ItemArray', 'a-block'
+      item.set 5
+      item.save
+      item = ItemArray.find_by name: 'a-block'
+      data = item.read_attribute( :data_integer )
+      assert_equal data, 5
+      assert_equal item.data, 5
+      if RUBY_VERSION.start_with? '2.4.'
+        assert_equal data.class, Integer
+      else
+        assert_equal data.class, Fixnum
+      end
+    end
+
+    # test 'should create an array item with values' do
     #   item = @page.create_block.create_item 'ContentsCore::ItemArray', 'a-block'
-    #   # TODO
+    #   binding.pry
+    #   # item.set 5
+    #   # item.save
+    #   # item = ItemArray.find_by name: 'a-block'
+    #   # data = item.read_attribute( :data_string )
+    #   # assert_equal data, '5'
+    #   # assert_equal item.data, '5'
+    #   # assert_equal data.class, String
     # end
 
     test 'should create a boolean item' do

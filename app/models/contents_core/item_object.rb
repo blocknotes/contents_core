@@ -1,9 +1,15 @@
 # TODO: needs improvements
 module ContentsCore
   class ItemObject < Item
-    alias_attribute :data, :data_hash
-
     serialize :data_hash, JSON
+
+    def data
+      self.data_hash.deep_symbolize_keys
+    end
+
+    def data=( value )
+      self.data_hash = value
+    end
 
     def init
       self.data = {}

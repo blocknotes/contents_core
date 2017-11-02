@@ -47,18 +47,18 @@ module ContentsCore
       },
     },
     items: {
-      array: {},
-      boolean: {},
-      datetime: {},
-      float: {},
-      hash: {},
-      file: {
+      item_array: {},
+      item_boolean: {},
+      item_datetime: {},
+      item_float: {},
+      item_hash: {},
+      item_file: {
         input: :file_image
       },
-      integer: {},
-      object: {},
-      string: {},
-      text: {
+      item_integer: {},
+      item_object: {},
+      item_string: {},
+      item_text: {
         input: :html
       },
     }

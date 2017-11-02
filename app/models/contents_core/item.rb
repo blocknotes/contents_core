@@ -23,8 +23,8 @@ module ContentsCore
     end
 
     def opt_input
-      if self.block.options[self.name] && self.block.options[self.name]['input']
-        self.block.options[self.name]['input'].to_s
+      if self.block.config[self.name] && self.block.config[self.name]['input']
+        self.block.config[self.name]['input'].to_s
       elsif config[:input]
         config[:input].to_s
       else

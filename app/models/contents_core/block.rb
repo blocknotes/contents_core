@@ -1,33 +1,33 @@
 module ContentsCore
   class Block < ApplicationRecord
+    # --- constants -----------------------------------------------------------
     EMPTY_DATA = OpenStruct.new( { data: '' } )
 
+    # --- misc ----------------------------------------------------------------
     attr_accessor :create_children
+    serialize :conf, JSON
 
-    # --- fields options ----------------------------------------------------- #
-    serialize :options, JSON
-    serialize :validations, JSON
-
-    # --- relations ---------------------------------------------------------- #
+    # --- associations --------------------------------------------------------
     belongs_to :parent, polymorphic: true
     has_many :cc_blocks, as: :parent, dependent: :destroy, foreign_key: 'parent_id', class_name: 'Block'
     has_many :items, dependent: :destroy
     accepts_nested_attributes_for :cc_blocks, allow_destroy: true
     accepts_nested_attributes_for :items
 
-    # --- hooks -------------------------------------------------------------- #
+    # --- callbacks -----------------------------------------------------------
+    # after_initialize :on_after_initialize
     before_create :on_before_create
     after_create :on_after_create
 
-    # --- scopes ------------------------------------------------------------- #
+    # --- scopes --------------------------------------------------------------
     default_scope { order( :position ) }
     scope :published, -> { where( published: true ) unless ContentsCore.editing }
     scope :with_nested, -> { includes( :items, cc_blocks: :items ) }
 
-    # --- validations -------------------------------------------------------- #
+    # --- validations ---------------------------------------------------------
     validates_presence_of :block_type, :position
 
-    # --- misc --------------------------------------------------------------- #
+    # --- tmp -----------------------------------------------------------------
     ## amoeba do
     ##   enable
     ##   # customize( lambda { |original_obj, new_obj|
@@ -53,9 +53,11 @@ module ContentsCore
     #
     # # scope :published, -> { where( published: true ) unless ApplicationController.edit_mode }
 
+    # --- methods -------------------------------------------------------------
     def initialize( attributes = {}, &block )
       super( attributes, &block )
       @create_children = 1
+      self.conf = {} unless self.conf
       self.group = config[:group]
       self.block_type = parent.config[:children_type] if attributes[:block_type].nil? && self.parent_type == 'ContentsCore::Block'
     end
@@ -73,14 +75,19 @@ module ContentsCore
     end
 
     def config
-      ContentsCore.config[:cc_blocks][block_type.to_sym] ? ContentsCore.config[:cc_blocks][block_type.to_sym] : {}
+      !self.conf.blank? ? self.conf.deep_symbolize_keys : ( ContentsCore.config[:cc_blocks][block_type.to_sym] ? ContentsCore.config[:cc_blocks][block_type.to_sym].deep_symbolize_keys : {} )
     end
 
-    def create_item( item_type, item_name = nil )
-      new_item = ContentsCore::Item.new( type: item_type )
-      new_item.name = item_name if item_name
-      self.items << new_item
-      new_item
+    def create_item( item_type, item_name = nil, value = nil )
+      if ContentsCore.config[:items].keys.include? item_type
+        new_item = ContentsCore::Item.new( type: 'ContentsCore::' + item_type.to_s.classify )
+        new_item.name = item_name if item_name
+        new_item.data = value if value
+        self.items << new_item
+        new_item
+      else
+        raise "Invalid item type: #{item_type} - check defined items in config"
+      end
     end
 
     def editable
@@ -132,6 +139,10 @@ module ContentsCore
       Block::init_items( self, config[:items] ) if Block::block_types( false ).include?( self.block_type.to_sym )
     end
 
+    # def on_after_initialize
+    #   self.conf = {} unless self.conf
+    # end
+
     def on_before_create
       if self.name.blank?
         names = parent.cc_blocks.map( &:name )
@@ -180,6 +191,10 @@ module ContentsCore
           break
         end
       end
+    end
+
+    def validations
+      config[:validations] || {}
     end
 
     def self.block_enum( include_children = true )

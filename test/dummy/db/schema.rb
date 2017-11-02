@@ -19,8 +19,7 @@ ActiveRecord::Schema.define(version: 20171030182924) do
     t.string "group"
     t.integer "position", default: 0, null: false
     t.boolean "published", default: true, null: false
-    t.string "options", default: "{}", null: false
-    t.string "validations", default: "{}", null: false
+    t.text "conf"
     t.integer "parent_id"
     t.string "parent_type"
     t.index ["parent_id", "parent_type"], name: "index_contents_core_blocks_on_parent_id_and_parent_type"

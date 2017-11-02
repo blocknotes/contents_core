@@ -7,8 +7,7 @@ class CreateContentsCoreBlocks < ActiveRecord::Migration[5.0]
       t.string  :group
       t.integer :position, null: false, default: 0
       t.boolean :published, null: false, default: true
-      t.string  :options, null: false, default: '{}'
-      t.string  :validations, null: false, default: '{}'
+      t.text    :conf
       t.integer :parent_id
       t.string  :parent_type
     end

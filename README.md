@@ -23,17 +23,55 @@ Goals:
 Edit the conf file: `config/initializers/contents_core.rb`
 
 ```ruby
-conf = ContentsCore.config
-# Adds a new custom block
-conf[:cc_blocks][:custom] = {
-  name: 'Custom block',
-  items: {
-    title: :item_string,
-    content: :item_text,
-    image: :item_file
+module ContentsCore
+  @@config = {
+    cc_blocks: {
+      text: {
+        name: 'Solo testo',
+        items: {
+          title: :item_string,
+          content: :item_text
+        }
+      },
+      image: {
+        name: 'Solo immagine',
+        items: {
+          img: :item_file
+        }
+      },
+      slide: {
+        name: 'Slide',
+        child_only: true,
+        items: {
+          img: :item_file,
+          link: :item_string,
+          title: :item_string
+        }
+      },
+      slider: {
+        children_type: :slide,
+        name: 'Slider',
+        items: {
+          slide: :slide
+        }
+      },
+    },
+    items: {
+      item_boolean: {},
+      item_datetime: {},
+      item_float: {},
+      item_hash: {},
+      item_file: {
+        input: :file_image
+      },
+      item_integer: {},
+      item_string: {},
+      item_text: {
+        input: :html
+      },
+    }
   }
-}
-ContentsCore.config( { components: conf[:cc_blocks] } )
+end
 ```
 
 Create the new view blocks: `app/views/contents_core/_block_custom.html.slim`
@@ -95,7 +133,7 @@ To add a new field to an existing block (ex. to first Page, on the first Block):
 
 ```rb
 block = Page.first.get_block 'text-1'
-block.create_item( 'ContentsCore::ItemString', 'new-field' ).set( 'A test...' ).save
+block.create_item( :item_string, 'new-field' ).set( 'A test...' ).save
 ```
 
 Then add to the block view: `block.get( 'new-field' )`

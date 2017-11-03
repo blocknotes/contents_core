@@ -60,8 +60,14 @@ module ContentsCore
       assert_equal Item.count, 2
     end
 
-    test 'should create a text block and initialize it with some values' do
-      @page.create_block :slider, { create_children: 1, values: { 'slide.title' => 'A title...' } }
+    test 'should create a text block and initialize it with some values (hash)' do
+      @page.create_block :slider, { create_children: 1, values: {slide: {title: 'A title...'}} }
+      block = Block.last
+      assert_equal block.get( 'slide.title' ), 'A title...'
+    end
+
+    test 'should create a text block and initialize it with some values (hash-list)' do
+      @page.create_block :slider, { create_children: 1, values_list: { 'slide.title' => 'A title...' } }
       block = Block.last
       assert_equal block.get( 'slide.title' ), 'A title...'
     end

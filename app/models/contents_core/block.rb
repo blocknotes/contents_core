@@ -146,8 +146,8 @@ module ContentsCore
     # end
 
     def on_before_create
-      if self.name.blank?
-        names = parent.cc_blocks.map( &:name )
+      names = parent.cc_blocks.map( &:name )
+      if self.name.blank? || names.include?( self.name )
         i = 0
         while( ( i += 1 ) < 1000 )  # Search an empty group
           unless names.include? "#{block_type}-#{i}"

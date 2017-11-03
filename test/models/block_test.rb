@@ -85,8 +85,7 @@ module ContentsCore
 
     # --- Access tests ---
     test 'should get an item of a block by name' do
-      # TODO: 3 'slide' - fix auto gen names!
-      block = @page.create_block :slider, { create_children: 3 }
+      block = @page.create_block :slider, name: 'sld', create_children: 3
       assert_equal block.get( 'slide.title' ), 'Title'  # default value
       block.set 'slide.title', 'A title...'
       block.save

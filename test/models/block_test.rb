@@ -64,7 +64,7 @@ module ContentsCore
       assert_not Block.new.save
     end
 
-    # --- Create tests ---
+    # --- Destroy tests ---
     test 'should destroy items' do
       @page.create_block
       assert_equal Block.count, 1
@@ -81,6 +81,17 @@ module ContentsCore
       block.destroy
       assert_equal Block.count, 0
       assert_equal Item.count, 0
+    end
+
+    # --- Access tests ---
+    test 'should get an item of a block by name' do
+      # TODO: 3 'slide' - fix auto gen names!
+      block = @page.create_block :slider, { create_children: 3 }
+      assert_equal block.get( 'slide.title' ), 'Title'  # default value
+      block.set 'slide.title', 'A title...'
+      block.save
+      block = Block.last
+      assert_equal block.get( 'slide.title' ), 'A title...'
     end
   end
 end

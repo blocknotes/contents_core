@@ -22,6 +22,8 @@ ActiveRecord::Schema.define(version: 20171030182924) do
     t.text "conf"
     t.integer "parent_id"
     t.string "parent_type"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["parent_id", "parent_type"], name: "index_contents_core_blocks_on_parent_id_and_parent_type"
   end
 
@@ -29,6 +31,8 @@ ActiveRecord::Schema.define(version: 20171030182924) do
     t.string "type"
     t.string "name", default: "data", null: false
     t.integer "block_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.boolean "data_boolean"
     t.datetime "data_datetime"
     t.string "data_file"

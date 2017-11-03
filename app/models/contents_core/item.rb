@@ -1,11 +1,13 @@
 module ContentsCore
   class Item < ApplicationRecord
-    # field :data, type: String
+    # --- associations --------------------------------------------------------
+    belongs_to :block, touch: true
 
+    # --- misc ----------------------------------------------------------------
+    # field :data, type: String
     # embedded_in :cc_blocks
 
-    belongs_to :block
-
+    # --- methods -------------------------------------------------------------
     def as_json( options = nil )
       super( {only: [:id, :name, :type], methods: [:data]}.merge(options || {}) )
     end

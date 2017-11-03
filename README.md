@@ -1,14 +1,14 @@
 # ContentsCore [![Gem Version](https://badge.fury.io/rb/contents_core.svg)](https://badge.fury.io/rb/contents_core) [![Build Status](https://travis-ci.org/blocknotes/contents_core.svg)](https://travis-ci.org/blocknotes/contents_core)
 
-A Rails gem which offer a simple structure to manage contents in a flexible way.
+A Rails gem which offer a simple structure to manage contents in a flexible way: blocks with recursive nested blocks + items as "leaf"
 
 Goals:
-
 - attach the contents structure to a model transparently
 - improve block views management
 - add fields to blocks without migrations
+- cache-ready - query and partials (if used)
 
-### Install
+## Install
 
 - Add to the Gemfile:
 `gem 'contents_core'`
@@ -18,7 +18,23 @@ Goals:
 - Add the concern *Blocks* to your model (ex. *Page*): `include ContentsCore::Blocks`
 - Add the blocks to a view (ex. *page show*): `= render partial: 'contents_core/blocks', locals: { container: @page }`
 
-### Config
+## Usage
+
+### Working with blocks/items
+
+- Basic operations:
+```ruby
+page = Page.first
+page.create_block :slider, name: 'a-slider', create_children: 3  # Create a silder with 3 slides
+page.current_blocks.map{ |block| block.name }  # all published blocks names (query cached)
+block = page.get_block 'a-slider'
+block.tree  # list all items of a block
+block.get 'slide-2.title'  # get value of 'title' field of sub block with name 'slide-2' (name automatically generated at creation)
+block.set 'slide-2.title'  # set field value
+block.save
+```
+
+## Config
 
 Edit the conf file: `config/initializers/contents_core.rb`
 
@@ -83,7 +99,7 @@ Create the new view blocks: `app/views/contents_core/_block_custom.html.slim`
   .image = image_tag block.get( 'image' ).url( :thumb )
 ```
 
-#### Images
+### Images
 
 To add support for images add CarrierWave gem to your Gemfile and execute: `rails generate uploader Image` and update che config file *config/initializers/contents_core.rb* with:
 
@@ -121,7 +137,7 @@ module ContentsCore
 end
 ```
 
-#### Customizations
+## Customizations
 
 To create a "free form" block just use: `Page.first.create_block :intro, name: 'IntroBlock', schema: { intro: :item_string, subtitle: :item_string }`
 
@@ -140,17 +156,17 @@ Then add to the block view: `block.get( 'new-field' )`
 
 To set a field value: `block.set( 'new-field', 'Some value' )`
 
-#### ActiveAdmin
+### ActiveAdmin
 
 If you use ActiveAdmin as admin interface you can find a sample model configuration: [page](extra/active_admin_page.rb) plus a js [page](extra/active_admin.js)
 
-### Notes
+## Notes
 
 - Blocks enum: `ContentsCore::Block.block_enum`
 - Blocks types: `ContentsCore::Block.block_types`
 - Default blocks [here](config/initializers/contents_core.rb)
 
-#### Structure
+### Structure
 
 - Including the Blocks concern to a model will add `has_many :cc_blocks` relationship (the list of blocks attached to a container) and some utility methods
 - Block: UI component, a group of items (ex. a text with a title, a slider, a 3 column text widget, etc.); built with a list of sub blocks (for nested components) and a list of items

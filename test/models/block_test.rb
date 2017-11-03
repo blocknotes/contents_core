@@ -32,16 +32,16 @@ module ContentsCore
       @page.create_block :text, { name: 'A block' }
       block = Block.last
       assert_equal block.name, 'A block'
-      assert_equal block.config[:items], {:title=>:item_string, :content=>:item_text}
+      assert_equal block.config[:items], {title: :item_string, content: :item_text}
     end
 
     test 'should create a slider block without slides' do
-      @page.create_block :slider, { create_children: 0 }
+      @page.create_block :slider
       assert_equal Block.where( block_type: 'slide' ).count, 0
     end
 
     test 'should create a slider block with 3 slides' do
-      block = @page.create_block :slider, { create_children: 3 }
+      block = @page.create_block :slider, create_children: 3
       assert block.has_children?
       assert block.children_type, :slide
       assert_equal Block.where( block_type: 'slide', parent: block ).count, 3
@@ -58,6 +58,12 @@ module ContentsCore
       assert_equal block.parent_type, Page.to_s
       assert_equal Block.count, 1
       assert_equal Item.count, 2
+    end
+
+    test 'should create a text block and initialize it with some values' do
+      @page.create_block :slider, { create_children: 1, values: { 'slide.title' => 'A title...' } }
+      block = Block.last
+      assert_equal block.get( 'slide.title' ), 'A title...'
     end
 
     test 'should not create a block without parent' do
@@ -87,10 +93,10 @@ module ContentsCore
     test 'should get an item of a block by name' do
       block = @page.create_block :slider, name: 'sld', create_children: 3
       assert_equal block.get( 'slide.title' ), 'Title'  # default value
-      block.set 'slide.title', 'A title...'
+      block.set 'slide-2.title', 'A title...'
       block.save
       block = Block.last
-      assert_equal block.get( 'slide.title' ), 'A title...'
+      assert_equal block.get( 'slide-2.title' ), 'A title...'
     end
   end
 end

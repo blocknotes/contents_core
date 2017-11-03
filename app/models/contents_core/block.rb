@@ -1,14 +1,14 @@
 module ContentsCore
   class Block < ApplicationRecord
     # --- constants -----------------------------------------------------------
-    EMPTY_DATA = OpenStruct.new( { data: '' } )
+    # EMPTY_DATA = OpenStruct.new( { data: '' } )
 
     # --- misc ----------------------------------------------------------------
     attr_accessor :create_children
     serialize :conf, Hash
 
     # --- associations --------------------------------------------------------
-    belongs_to :parent, polymorphic: true
+    belongs_to :parent, polymorphic: true, touch: true
     has_many :cc_blocks, as: :parent, dependent: :destroy, foreign_key: 'parent_id', class_name: 'Block'
     has_many :items, dependent: :destroy
     accepts_nested_attributes_for :cc_blocks, allow_destroy: true
@@ -165,6 +165,7 @@ module ContentsCore
         pieces[type.pluralize.to_sym] = []
       end
       items.each do |item|  # TODO: improve me
+        pieces[item.class.type_name.pluralize.to_sym] = [] unless pieces[item.class.type_name.pluralize.to_sym]
         pieces[item.class.type_name.pluralize.to_sym].push item
       end
       Item::item_types.each do |type|

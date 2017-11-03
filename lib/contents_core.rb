@@ -15,6 +15,10 @@ module ContentsCore
     block.create_children = params[:create_children].to_i if params[:create_children]
     parent.cc_blocks << block
     Block::init_items block, params[:schema], {create_children: params[:create_children]} if params[:schema]
+    if params[:values]
+      params[:values].each{ |k, v| block.set k.to_s, v }
+      block.save
+    end
     block
   end
 

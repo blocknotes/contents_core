@@ -12,9 +12,11 @@ module ContentsCore
       end
 
       def current_blocks( version = 0 )
-        return @current_blocks if @current_blocks
+        # return @current_blocks if @current_blocks
         version = 0 unless ContentsCore.editing  # no admin = only current version
-        @current_blocks = cc_blocks.where( version: version.to_i ).with_nested.published
+        Rails.cache.fetch( "#{cache_key}/current_blocks/#{version}", expires_in: 12.hours ) do
+          self.cc_blocks.where( version: version.to_i ).with_nested.published
+        end
       end
 
       def get_block( name, version = 0 )
@@ -23,6 +25,12 @@ module ContentsCore
         end
         nil
       end
+
+      protected
+
+        def cache_key
+          self.cc_blocks.published.select( :updated_at ).order( updated_at: :desc ).first.try( :updated_at ).to_i
+        end
     end
   end
 end

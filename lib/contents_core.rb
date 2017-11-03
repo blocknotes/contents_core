@@ -22,4 +22,13 @@ module ContentsCore
     @@editing = editing unless editing.nil?
     @@editing
   end
+
+  # def self.parse_attr( attribute )
+  #   attr = attribute.to_s
+  #   if attr.include?( '.' )
+  #     attrs = attr.split( '.' )
+  #     attr  = attrs.shift + attrs.map{|tok| "[#{tok}]"}.join
+  #   end
+  #   attr
+  # end
 end

@@ -5,7 +5,7 @@ module ContentsCore
 
     # --- misc ----------------------------------------------------------------
     attr_accessor :create_children
-    serialize :conf, JSON
+    serialize :conf, Hash
 
     # --- associations --------------------------------------------------------
     belongs_to :parent, polymorphic: true
@@ -56,7 +56,7 @@ module ContentsCore
     # --- methods -------------------------------------------------------------
     def initialize( attributes = {}, &block )
       super( attributes, &block )
-      @create_children = 1
+      @create_children = 0
       self.conf = {} unless self.conf
       self.group = config[:group]
       self.block_type = parent.config[:children_type] if attributes[:block_type].nil? && self.parent_type == 'ContentsCore::Block'
@@ -75,7 +75,7 @@ module ContentsCore
     end
 
     def config
-      !self.conf.blank? ? self.conf.deep_symbolize_keys : ( ContentsCore.config[:cc_blocks][block_type.to_sym] ? ContentsCore.config[:cc_blocks][block_type.to_sym].deep_symbolize_keys : {} )
+      !self.conf.blank? ? self.conf : ( ContentsCore.config[:cc_blocks][block_type.to_sym] ? ContentsCore.config[:cc_blocks][block_type.to_sym] : {} )
     end
 
     def create_item( item_type, item_name = nil, value = nil )
@@ -108,18 +108,20 @@ module ContentsCore
       ).map { |k, v| "#{k}=\"#{v}\"" }.join( ' ' ).html_safe : ''
     end
 
-    # Returns an item by name
+    # Returns an item value by name
     def get( name )
       item = get_item( name )
-      item.data if item
+      item && item.is_a?( Item ) ? item.data : nil
     end
 
+    # Returns an item by name
     def get_item( name )
-      unless @_items
-        @_items = {}
-        items.each { |item| @_items[item.name] = item }
+      t = tree
+      name.split( '.' ).each do |tok|
+        return nil unless t[tok]
+        t = t[tok]
       end
-      @_items[name]
+      t
     end
 
     def has_parent?
@@ -185,12 +187,16 @@ module ContentsCore
     end
 
     def set( name, value )
-      items.each do |item|
-        if item.name == name
-          item.data = value
-          break
-        end
-      end
+      item = get_item( name )
+      item && item.is_a?( Item ) ? item.data = value : nil
+    end
+
+    def tree
+      # return @items_tree if @items_tree
+      @items_tree = {}  # prepare a complete list of items
+      self.items.each{ |item| @items_tree[item.name] = item }
+      self.cc_blocks.each_with_index{ |block, i| @items_tree[block.name] = block.tree }  # @items_tree[i] = block.tree
+      @items_tree
     end
 
     def validations

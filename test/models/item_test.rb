@@ -10,14 +10,14 @@ module ContentsCore
     # --- Create tests ---
     test 'should create an item' do
       block = @page.create_block
-      block.create_item :item_integer, 'an-item'
+      block.create_item :item_integer, name: 'an-item'
       item = ItemInteger.find_by name: 'an-item'
       assert_equal Item.count, 3
       assert_equal item.name, 'an-item'
     end
 
     test 'should create an array item' do
-      item = @page.create_block.create_item :item_array, 'an-item', 5
+      item = @page.create_block.create_item :item_array, name: 'an-item', value: 5
       item.save
       item = ItemArray.find_by name: 'an-item'
       assert_equal item.read_attribute( :data_integer ), 5
@@ -37,7 +37,7 @@ module ContentsCore
     # end
 
     test 'should create a boolean item' do
-      item = @page.create_block.create_item :item_boolean, 'an-item'
+      item = @page.create_block.create_item :item_boolean, name: 'an-item'
       item.set true
       item.save
       item = ItemBoolean.find_by name: 'an-item'
@@ -47,7 +47,7 @@ module ContentsCore
 
     test 'should create a datetime item' do
       dt = Time.zone.now.change hour: 12
-      item = @page.create_block.create_item :item_datetime, 'an-item'
+      item = @page.create_block.create_item :item_datetime, name: 'an-item'
       item.set dt
       item.save
       item = ItemDatetime.find_by name: 'an-item'
@@ -59,7 +59,7 @@ module ContentsCore
     end
 
     test 'should create a file item' do
-      item = @page.create_block.create_item :item_file, 'an-item'
+      item = @page.create_block.create_item :item_file, name: 'an-item'
       item.set 'a-filename'
       item.save
       item = ItemFile.find_by name: 'an-item'
@@ -68,7 +68,7 @@ module ContentsCore
     end
 
     test 'should create a float item' do
-      item = @page.create_block.create_item :item_float, 'an-item'
+      item = @page.create_block.create_item :item_float, name: 'an-item'
       item.set 12.34
       item.save
       item = ItemFloat.find_by name: 'an-item'
@@ -78,7 +78,7 @@ module ContentsCore
 
     test 'should create an hash item' do
       v = {a_key: 'A value', another_key: {a_sub_key: 'Another value'}}
-      item = @page.create_block.create_item :item_hash, 'an-item'
+      item = @page.create_block.create_item :item_hash, name: 'an-item'
       item.set v
       item.save
       item = ItemHash.find_by name: 'an-item'
@@ -87,7 +87,7 @@ module ContentsCore
     end
 
     test 'should create an integer item' do
-      item = @page.create_block.create_item :item_integer, 'an-item', 12
+      item = @page.create_block.create_item :item_integer, name: 'an-item', value: 12
       item.save
       item = ItemInteger.find_by name: 'an-item'
       assert_equal item.read_attribute( :data_integer ), 12
@@ -101,14 +101,14 @@ module ContentsCore
 
     test 'should create an object item' do
       v = {a_key: 'A value', another_key: {a_sub_key: 'Another value'}}
-      item = @page.create_block.create_item :item_object, 'an-item', v
+      item = @page.create_block.create_item :item_object, name: 'an-item', value: v
       item.save
       item = ItemObject.find_by name: 'an-item'
       assert_equal item.data, v
     end
 
     test 'should create a string item' do
-      item = @page.create_block.create_item :item_string, 'an-item', 'A test string'
+      item = @page.create_block.create_item :item_string, name: 'an-item', value: 'A test string'
       item.save
       item = ItemString.find_by name: 'an-item'
       assert_equal item.read_attribute( :data_string ), 'A test string'
@@ -116,7 +116,7 @@ module ContentsCore
     end
 
     test 'should create a text item' do
-      item = @page.create_block.create_item :item_text, 'an-item', 'Some text'
+      item = @page.create_block.create_item :item_text, name: 'an-item', value: 'Some text'
       item.save
       item = ItemText.find_by name: 'an-item'
       assert_equal item.read_attribute( :data_text ), 'Some text'

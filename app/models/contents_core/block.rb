@@ -70,21 +70,18 @@ module ContentsCore
       "#{self.class.to_s.split('::').last}-#{self.id}"
     end
 
-    def new_children
-      config[:new_children]
-    end
-
     def config
       !self.conf.blank? ? self.conf : ( ContentsCore.config[:blocks][block_type.to_sym] ? ContentsCore.config[:blocks][block_type.to_sym] : {} )
     end
 
-    def create_item( item_type, item_name = nil, value = nil )
+    def create_item( item_type, options = {} )
       if ContentsCore.config[:items].keys.include? item_type
-        new_item = ContentsCore::Item.new( type: 'ContentsCore::' + item_type.to_s.classify )
-        new_item.name = item_name if item_name
-        new_item.data = value if value
-        self.items << new_item
-        new_item
+        attrs = { type: "ContentsCore::#{item_type.to_s.classify}" }
+        attrs[:name] = options[:name]  if options[:name]
+        attrs[:data] = options[:value] if options[:value]
+        item = self.items.new attrs
+        item.save
+        item
       else
         raise "Invalid item type: #{item_type} - check defined items in config"
       end
@@ -133,7 +130,11 @@ module ContentsCore
     end
 
     def is_sub_block?
-      parent.present? && parent_type == 'ContentsCore::Block'
+      self.parent.present? && self.parent.is_a?( Block )
+    end
+
+    def new_children
+      config[:new_children]
     end
 
     def on_after_create
@@ -231,6 +232,12 @@ module ContentsCore
         end
       end if children
       block.save
+    end
+
+    def self.items_keys( keys )
+      keys.map do |k, v|
+        v.is_a?( Hash ) ? items_keys( v ) : k
+      end.flatten
     end
 
     def self.permitted_attributes

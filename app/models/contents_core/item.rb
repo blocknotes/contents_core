@@ -3,9 +3,15 @@ module ContentsCore
     # --- associations --------------------------------------------------------
     belongs_to :block, touch: true
 
+    # --- callbacks -----------------------------------------------------------
+    before_create :on_before_create
+
     # --- misc ----------------------------------------------------------------
     # field :data, type: String
     # embedded_in :cc_blocks
+
+    # --- validations ---------------------------------------------------------
+    validates :block, presence: true, allow_blank: false
 
     # --- methods -------------------------------------------------------------
     def as_json( options = nil )
@@ -30,6 +36,23 @@ module ContentsCore
 
     def editable
       ContentsCore.editing ? " data-ec-item=\"#{self.id}\" data-ec-input=\"#{self.opt_input}\" data-ec-type=\"#{self.class_name}\"".html_safe : ''
+    end
+
+    def on_before_create
+      # root_block = self.block
+      # root_block = root_block.parent while root_block.parent.is_a? Block
+      # names = Block.items_keys root_block.tree
+      names = ( self.block.items - [self] ).pluck :name
+      if self.name.blank? || names.include?( self.name )
+        t = self.class::type_name
+        i = 0
+        while( ( i += 1 ) < 1000 )  # Search an empty group
+          unless names.include? "#{t}-#{i}"
+            self.name = "#{t}-#{i}"
+            break
+          end
+        end
+      end
     end
 
     def opt_input
@@ -90,7 +113,7 @@ module ContentsCore
       end
     end
 
-    def converted_data()
+    def converted_data
       if data_type
         case data_type
         when :boolean

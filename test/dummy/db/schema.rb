@@ -14,9 +14,9 @@ ActiveRecord::Schema.define(version: 20171030182924) do
 
   create_table "contents_core_blocks", force: :cascade do |t|
     t.string "block_type", default: "text", null: false
-    t.integer "version", default: 0, null: false
-    t.string "name", default: "", null: false
+    t.string "name"
     t.string "group"
+    t.integer "version", default: 0, null: false
     t.integer "position", default: 0, null: false
     t.boolean "published", default: true, null: false
     t.text "conf"
@@ -29,7 +29,7 @@ ActiveRecord::Schema.define(version: 20171030182924) do
 
   create_table "contents_core_items", force: :cascade do |t|
     t.string "type"
-    t.string "name", default: "data", null: false
+    t.string "name"
     t.integer "block_id"
     t.boolean "data_boolean"
     t.datetime "data_datetime"

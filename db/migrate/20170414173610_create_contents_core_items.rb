@@ -2,7 +2,7 @@ class CreateContentsCoreItems < ActiveRecord::Migration[5.0]
   def change
     create_table :contents_core_items do |t|
       t.string     :type
-      t.string     :name, null: false, default: 'data'
+      t.string     :name
       t.integer    :block_id
       t.boolean    :data_boolean
       t.datetime   :data_datetime

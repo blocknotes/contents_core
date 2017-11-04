@@ -1,11 +1,11 @@
 # ContentsCore [![Gem Version](https://badge.fury.io/rb/contents_core.svg)](https://badge.fury.io/rb/contents_core) [![Build Status](https://travis-ci.org/blocknotes/contents_core.svg)](https://travis-ci.org/blocknotes/contents_core)
 
-A Rails gem which offer a simple structure to manage contents in a flexible way: blocks with recursive nested blocks + items as "leaf"
+A Rails gem which offer a simple structure to manage contents in a flexible way: blocks with recursive nested blocks + items as "leaves"
 
 Goals:
 - attach the contents structure to a model transparently
 - add fields to blocks without migrations
-- improve block views management
+- offer helpers to render blocks in views
 - cache-ready
 
 ## Install
@@ -32,6 +32,13 @@ block.tree  # list all items of a block
 block.get 'slide-2.title'  # get value of 'title' field of sub block with name 'slide-2' (name automatically generated at creation)
 block.set 'slide-2.title'  # set field value
 block.save
+```
+
+- Other operations:
+```ruby
+block = ContentsCore::Block.last
+ContentsCore.create_block_in_parent block, :text  # create a sub block in a block
+block.create_item :item_string, name: 'a-field'
 ```
 
 ## Config
@@ -149,7 +156,7 @@ To add a new field to an existing block (ex. to first Page, on the first Block):
 
 ```rb
 block = Page.first.get_block 'text-1'
-block.create_item( :item_string, 'new-field' ).set( 'A test...' ).save
+block.create_item( :item_string, name: 'new-field' ).set( 'A test...' ).save
 ```
 
 Then add to the block view: `block.get( 'new-field' )`

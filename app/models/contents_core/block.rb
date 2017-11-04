@@ -59,7 +59,7 @@ module ContentsCore
       @create_children = 0
       self.conf = {} unless self.conf
       self.group = config[:group]
-      self.block_type = parent.config[:children_type] if attributes[:block_type].nil? && self.parent_type == 'ContentsCore::Block'
+      self.block_type = parent.config[:new_children] if attributes[:block_type].nil? && self.parent_type == 'ContentsCore::Block'
     end
 
     def as_json( options = nil )
@@ -70,12 +70,12 @@ module ContentsCore
       "#{self.class.to_s.split('::').last}-#{self.id}"
     end
 
-    def children_type
-      config[:children_type]
+    def new_children
+      config[:new_children]
     end
 
     def config
-      !self.conf.blank? ? self.conf : ( ContentsCore.config[:cc_blocks][block_type.to_sym] ? ContentsCore.config[:cc_blocks][block_type.to_sym] : {} )
+      !self.conf.blank? ? self.conf : ( ContentsCore.config[:blocks][block_type.to_sym] ? ContentsCore.config[:blocks][block_type.to_sym] : {} )
     end
 
     def create_item( item_type, item_name = nil, value = nil )
@@ -101,7 +101,7 @@ module ContentsCore
         } :
         {
           'data-ec-block': self.id,
-          'data-ec-container': self.children_type,
+          'data-ec-container': self.new_children,
           'data-ec-ct': self.block_type,
           'data-ec-pub': self.published
         }
@@ -138,7 +138,7 @@ module ContentsCore
 
     def on_after_create
       # TODO: validates type before creation!
-      Block::init_items( self, config[:items] ) if Block::block_types( false ).include?( self.block_type.to_sym )
+      Block.initialize_children( self, config[:children] ) if Block.types( false ).include?( self.block_type.to_sym )
     end
 
     # def on_after_initialize
@@ -161,15 +161,15 @@ module ContentsCore
     def props
       pieces = {}
 
-      Item::item_types.each do |type|
-        pieces[type.pluralize.to_sym] = []
+      Item.types.each do |type|
+        pieces[type.to_s.pluralize.to_sym] = []
       end
       items.each do |item|  # TODO: improve me
         pieces[item.class.type_name.pluralize.to_sym] = [] unless pieces[item.class.type_name.pluralize.to_sym]
         pieces[item.class.type_name.pluralize.to_sym].push item
       end
-      Item::item_types.each do |type|
-        pieces[type.to_sym] = pieces[type.pluralize.to_sym].any? ? pieces[type.pluralize.to_sym].first : nil  # EMPTY_DATA - empty Item per sti class?
+      Item.types.each do |type|
+        pieces[type] = pieces[type.pluralize.to_sym].any? ? pieces[type.pluralize.to_sym].first : nil  # EMPTY_DATA - empty Item per sti class?
       end
 
       # pieces = {
@@ -204,36 +204,36 @@ module ContentsCore
       config[:validations] || {}
     end
 
-    def self.block_enum( include_children = true )
-      ContentsCore.config[:cc_blocks].map{|k, v| [v[:name], k.to_s] if !include_children || !v[:child_only]}.compact.sort_by{|b| b[0]}
+    def self.enum( include_children = true )
+      ContentsCore.config[:blocks].map{|k, v| [I18n.t( 'contents_core.blocks.' + v[:name].to_s ), k.to_s] if !include_children || !v[:child_only]}.compact.sort_by{|b| b[0]}
     end
 
-    def self.block_types( include_children = true )
-      ContentsCore.config[:cc_blocks].select{|k, v| !include_children || !v[:child_only]}.keys
-    end
-
-    def self.init_items( block, items, options = {} )
-      items.each do |name, type|
+    def self.initialize_children( block, children, options = {} )
+      children.each do |name, type|
         t = type.to_sym
-        if type.to_s.start_with? 'item_'
+        if Item.types.include? t
           c = 'ContentsCore::' + ActiveSupport::Inflector.camelize( t )
           begin
             model = c.constantize
           rescue Exception => e
-            Rails.logger.error '[ERROR] ContentsCore - init_items: ' + e.message
+            Rails.logger.error '[ERROR] ContentsCore - initialize_children: ' + e.message
             model = false
           end
           block.items << model.new( name: name ).init if model
-        elsif Block::block_types( false ).include? t.to_sym
+        elsif Block.types( false ).include? t
           block.create_children.times do
             block.cc_blocks << Block.new( block_type: t, name: name )
           end
         end
-      end if items
+      end if children
     end
 
     def self.permitted_attributes
       [ :id, :name, :block_type, :position, :_destroy, items_attributes: [ :id ] + Item::permitted_attributes, cc_blocks_attributes: [ :id, :name, :block_type, items_attributes: [ :id ] + Item::permitted_attributes ] ]
+    end
+
+    def self.types( include_children = true )
+      @@types ||= ContentsCore.config[:blocks].select{|k, v| !include_children || !v[:child_only]}.keys.map( &:to_sym )
     end
   end
 end

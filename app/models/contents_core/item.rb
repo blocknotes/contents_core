@@ -20,6 +20,14 @@ module ContentsCore
       self.class.to_s.split('::').last
     end
 
+    def config
+      @config ||= self.block && self.block.config[:options] && self.block.config[:options][self.name.to_sym] ? self.block.config[:options][self.name.to_sym] : ( ContentsCore.config[:items][self.class::type_name.to_sym] ? ContentsCore.config[:items][self.class::type_name.to_sym] : {} )
+    end
+
+    def data_type
+      @data_type ||= ( config[:data_type] || :string ).to_sym
+    end
+
     def editable
       ContentsCore.editing ? " data-ec-item=\"#{self.id}\" data-ec-input=\"#{self.opt_input}\" data-ec-type=\"#{self.class_name}\"".html_safe : ''
     end
@@ -52,20 +60,12 @@ module ContentsCore
       self.save
     end
 
-    def self.item_types
-      @@item_types ||= ContentsCore.config[:items].keys.map( &:to_s )
-    end
-
     def self.permitted_attributes
       [ :data_boolean, :data_datetime, :data_file, :data_float, :data_hash, :data_integer, :data_string, :data_text ]
     end
 
-    def config
-      @config ||= self.block && self.block.config[:options] && self.block.config[:options][self.name.to_sym] ? self.block.config[:options][self.name.to_sym] : ( ContentsCore.config[:items][self.class::type_name.to_sym] ? ContentsCore.config[:items][self.class::type_name.to_sym] : {} )
-    end
-
-    def data_type
-      @data_type ||= ( config[:data_type] || :string ).to_sym
+    def self.types
+      @@types ||= ContentsCore.config[:items].keys.map( &:to_sym )
     end
 
   protected

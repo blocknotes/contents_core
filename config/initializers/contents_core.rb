@@ -2,44 +2,44 @@ module ContentsCore
   @@editing = false
 
   @@config = {
-    cc_blocks: {
+    blocks: {
       image: {
         name: 'Image block',
-        items: {
+        children: {
           img: :item_file
         }
       },
       multi_text: {
-        children_type: :text,
         name: 'Multi columns block',
-        items: {
+        new_children: :text,
+        children: {
           column: :text
-        }
+        },
       },
       slide: {
         name: 'Slide block',
-        items: {
+        children: {
           img: :item_file,
           title: :item_string
         }
       },
       slider: {
-        children_type: :slide,
         name: 'Slider block',
-        items: {
+        new_children: :slide,
+        children: {
           slide: :slide
         }
       },
       text: {
         name: 'Text block',
-        items: {
+        children: {
           title: :item_string,
           content: :item_text
         }
       },
       text_with_image: {
         name: 'Text with image block',
-        items: {
+        children: {
           img: :item_file,
           title: :item_string,
           content: :item_text

@@ -32,7 +32,7 @@ module ContentsCore
       @page.create_block :text, { name: 'A block' }
       block = Block.last
       assert_equal block.name, 'A block'
-      assert_equal block.config[:items], {title: :item_string, content: :item_text}
+      assert_equal block.config[:children], {title: :item_string, content: :item_text}
     end
 
     test 'should create a slider block without slides' do
@@ -43,7 +43,7 @@ module ContentsCore
     test 'should create a slider block with 3 slides' do
       block = @page.create_block :slider, create_children: 3
       assert block.has_children?
-      assert block.children_type, :slide
+      assert block.new_children, :slide
       assert_equal Block.where( block_type: 'slide', parent: block ).count, 3
       block = Block.where( block_type: 'slide', parent: block ).last
       assert block.is_sub_block?

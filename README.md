@@ -4,9 +4,9 @@ A Rails gem which offer a simple structure to manage contents in a flexible way:
 
 Goals:
 - attach the contents structure to a model transparently
-- improve block views management
 - add fields to blocks without migrations
-- cache-ready - query and partials (if used)
+- improve block views management
+- cache-ready
 
 ## Install
 
@@ -16,17 +16,17 @@ Goals:
 `rails contents_core:install:migrations`
 - Execute migrations
 - Add the concern *Blocks* to your model (ex. *Page*): `include ContentsCore::Blocks`
-- Add the blocks to a view (ex. *page show*): `= render partial: 'contents_core/blocks', locals: { container: @page }`
+- Optionally add the blocks to a view (ex. *page show*): `= render partial: 'contents_core/blocks', locals: { container: @page }`
 
 ## Usage
 
 ### Working with blocks/items
 
-- Basic operations:
+- Basic operations (example parent model: *Page*):
 ```ruby
 page = Page.first
 page.create_block :slider, name: 'a-slider', create_children: 3  # Create a silder with 3 slides
-page.current_blocks.map{ |block| block.name }  # all published blocks names (query cached)
+page.current_blocks.map{ |block| block.name }  # current_blocks -> all published ordered blocks and query cached
 block = page.get_block 'a-slider'
 block.tree  # list all items of a block
 block.get 'slide-2.title'  # get value of 'title' field of sub block with name 'slide-2' (name automatically generated at creation)
@@ -41,33 +41,33 @@ Edit the conf file: `config/initializers/contents_core.rb`
 ```ruby
 module ContentsCore
   @@config = {
-    cc_blocks: {
+    blocks: {
       text: {
-        name: 'Solo testo',
-        items: {
+        name: :text_only,       # used as reference / for translations
+        children: {             # children: sub blocks & items
           title: :item_string,
           content: :item_text
         }
       },
       image: {
-        name: 'Solo immagine',
-        items: {
+        name: :image_only,
+        children: {
           img: :item_file
         }
       },
       slide: {
-        name: 'Slide',
-        child_only: true,
-        items: {
+        name: :a_slide,
+        child_only: true,       # used only as child of another block (slider)
+        children: {
           img: :item_file,
           link: :item_string,
           title: :item_string
         }
       },
       slider: {
-        children_type: :slide,
-        name: 'Slider',
-        items: {
+        name: :a_slider,
+        new_children: :slide,   # block type used when creating a new child with default params
+        children: {
           slide: :slide
         }
       },
@@ -143,7 +143,7 @@ To create a "free form" block just use: `Page.first.create_block :intro, name: '
 
 Then create a *app/view/contents_core/_block_intro* view.
 
-To list the blocks of a page: `Page.first.cc_blocks.pluck :name`
+To list the blocks of a page manually (but *current_blocks* method is the preferred way): `Page.first.cc_blocks.pluck :name`
 
 To add a new field to an existing block (ex. to first Page, on the first Block):
 
@@ -162,8 +162,8 @@ If you use ActiveAdmin as admin interface you can find a sample model configurat
 
 ## Notes
 
-- Blocks enum: `ContentsCore::Block.block_enum`
-- Blocks types: `ContentsCore::Block.block_types`
+- Blocks enum: `ContentsCore::Block.enum`
+- Blocks types: `ContentsCore::Block.types`
 - Default blocks [here](config/initializers/contents_core.rb)
 
 ### Structure

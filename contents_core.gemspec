@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.email       = ["mat@blocknot.es"]
   s.homepage    = "https://github.com/blocknotes/contents_core"
   s.summary     = "Flexible contents structure for Rails"
-  s.description = "A Rails gem which offer a simple structure to manage contents in a flexible way"
+  s.description = "A Rails gem which offer a structure to manage contents in a flexible way: blocks with recursive nested blocks + items as \"leaves\""
   s.license     = "MIT"
 
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.md"]

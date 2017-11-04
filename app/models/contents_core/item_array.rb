@@ -44,6 +44,8 @@ module ContentsCore
 
     def init
       self.data_string = []
+      self.data_hash = []
+      self.data_text = []
       self
     end
 

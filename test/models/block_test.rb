@@ -98,7 +98,7 @@ module ContentsCore
     # --- Access tests ---
     test 'should get an item of a block by name' do
       block = @page.create_block :slider, name: 'sld', create_children: 3
-      assert_equal block.get( 'slide.title' ), 'Title'  # default value
+      assert_equal block.get( 'slide.title' ), ''
       block.set 'slide-2.title', 'A title...'
       block.save
       block = Block.last

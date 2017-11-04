@@ -31,8 +31,6 @@ ActiveRecord::Schema.define(version: 20171030182924) do
     t.string "type"
     t.string "name", default: "data", null: false
     t.integer "block_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
     t.boolean "data_boolean"
     t.datetime "data_datetime"
     t.string "data_file"
@@ -41,6 +39,8 @@ ActiveRecord::Schema.define(version: 20171030182924) do
     t.integer "data_integer"
     t.string "data_string"
     t.text "data_text"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["block_id"], name: "index_contents_core_items_on_block_id"
   end
 

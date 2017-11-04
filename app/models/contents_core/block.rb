@@ -219,13 +219,18 @@ module ContentsCore
             Rails.logger.error '[ERROR] ContentsCore - initialize_children: ' + e.message
             model = false
           end
-          block.items << model.new( name: name ).init if model
+          if model
+            item = block.items.new( type: model.name, name: name )
+            item.init
+          end
         elsif Block.types( false ).include? t
           block.create_children.times do
-            block.cc_blocks << Block.new( block_type: t, name: name )
+            block.cc_blocks.new( block_type: t, name: name )
+            block.save
           end
         end
       end if children
+      block.save
     end
 
     def self.permitted_attributes

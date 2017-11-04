@@ -35,7 +35,12 @@ module ContentsCore
         children: {
           title: :item_string,
           content: :item_text
-        }
+        },
+        # options: {
+        #   title: {
+        #     validate: ->( item ) { item.errors.add( :data_string, "can't be blank" ) if item.data.blank? }
+        #   }
+        # }
       },
       text_with_image: {
         name: 'Text with image block',

@@ -26,6 +26,8 @@ module ContentsCore
 
     # --- validations ---------------------------------------------------------
     validates_presence_of :block_type, :position
+    validates_associated :cc_blocks
+    validates_associated :items
 
     # --- tmp -----------------------------------------------------------------
     ## amoeba do

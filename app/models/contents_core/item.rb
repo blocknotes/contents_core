@@ -11,6 +11,7 @@ module ContentsCore
     # embedded_in :cc_blocks
 
     # --- validations ---------------------------------------------------------
+    validate :validate_item
     validates :block, presence: true, allow_blank: false
 
     # --- methods -------------------------------------------------------------
@@ -27,7 +28,7 @@ module ContentsCore
     end
 
     def config
-      @config ||= self.block && self.block.config[:options] && self.block.config[:options][self.name.to_sym] ? self.block.config[:options][self.name.to_sym] : ( ContentsCore.config[:items][self.class::type_name.to_sym] ? ContentsCore.config[:items][self.class::type_name.to_sym] : {} )
+      @config ||= self.block && self.block.config[:options] && self.name && self.block.config[:options][self.name.to_sym] ? self.block.config[:options][self.name.to_sym] : ( ContentsCore.config[:items][self.class::type_name.to_sym] ? ContentsCore.config[:items][self.class::type_name.to_sym] : {} )
     end
 
     def data_type
@@ -83,8 +84,16 @@ module ContentsCore
       self.save
     end
 
+    def validate_item
+      config[:validate].call( self ) if config[:validate]
+    end
+
     def self.permitted_attributes
       [ :data_boolean, :data_datetime, :data_file, :data_float, :data_hash, :data_integer, :data_string, :data_text ]
+    end
+
+    def self.type_name
+      ''
     end
 
     def self.types

@@ -1,3 +1,15 @@
+## Add to 'config.after_initialize do' in 'application.rb'
+#
+# ContentsCore::ItemObject.class_eval do
+#   def data=( value )
+#     self.from_string( value )
+#   end
+# end
+#
+# ContentsCore::ItemFile.class_eval do
+#   mount_uploader :data_file, ImageUploader
+# end
+
 module Formtastic
   module Inputs
     class HashInput < Formtastic::Inputs::StringInput
@@ -23,17 +35,6 @@ module Formtastic
     end
   end
 end
-
-# ContentsCore::ItemObject.class_eval do
-#   def data=( value )
-#     self.from_string( value )
-#   end
-# end
-
-## Add to 'config.after_initialize do' in 'application.rb'
-# ContentsCore::ItemFile.class_eval do
-#   mount_uploader :data_file, ImageUploader
-# end
 
 def data_attrs( object )
   ret = {label: I18n.t("activerecord.attributes.contents_core/item.#{object.name}"), input_html:{'data-cc-class': object.class.to_s}}
@@ -61,7 +62,7 @@ ActiveAdmin.register Page do
   filter :title
   filter :published
 
-  # permit_params do
+  # permit_params do  # TODO: it would be better, but for hash items?
   #   Page.column_names + [ :cc_blocks ] + [
   #     cc_blocks_attributes: [
   #       :id, :name, :block_type, :position, :_destroy, items_attributes: [ :id, :data ],

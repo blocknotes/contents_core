@@ -12,7 +12,7 @@ module ContentsCore
     end
 
     def init
-      self.data = {}
+      self.data = {} unless self.data
       self
     end
 

@@ -43,9 +43,11 @@ module ContentsCore
     end
 
     def init
-      self.data_string = []
-      self.data_hash = []
-      self.data_text = []
+      unless self.data
+        self.data_string = []
+        self.data_hash = []
+        self.data_text = []
+      end
       self
     end
 

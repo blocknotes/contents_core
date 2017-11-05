@@ -3,7 +3,7 @@ module ContentsCore
     alias_attribute :data, :data_boolean
 
     def init
-      self.data = 0
+      self.data = false unless self.data
       self
     end
 

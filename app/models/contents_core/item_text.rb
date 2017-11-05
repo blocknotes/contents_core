@@ -3,7 +3,7 @@ module ContentsCore
     alias_attribute :data, :data_text
 
     def init
-      self.data = ''  # self.name.gsub( /-/, ' ' ).humanize
+      self.data = '' unless self.data  # self.name.gsub( /-/, ' ' ).humanize
       self
     end
 

@@ -13,7 +13,7 @@ module ContentsCore
     block.conf = params[:conf] if params[:conf]
     # block.validations = params[:validations] if params[:validations]
     block.create_children = params[:create_children].to_i if params[:create_children]
-    parent.cc_blocks << block
+    parent.cc_blocks << block  # TODO: change me (with cc_blocks.new)
     Block::initialize_children block, params[:schema], {create_children: params[:create_children]} if params[:schema]
     if params[:values]
       traverse_hash block.tree, params[:values]

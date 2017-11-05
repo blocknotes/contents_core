@@ -5,7 +5,7 @@ module ContentsCore
     # validate :on_validate
 
     def init
-      self.data = ''  # self.name.gsub( /-/, ' ' ).humanize
+      self.data = '' unless self.data  # self.name.gsub( /-/, ' ' ).humanize
       self
     end
 

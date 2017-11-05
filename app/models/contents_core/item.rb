@@ -4,6 +4,7 @@ module ContentsCore
     belongs_to :block, touch: true
 
     # --- callbacks -----------------------------------------------------------
+    after_initialize :on_after_initialize
     before_create :on_before_create
 
     # --- misc ----------------------------------------------------------------
@@ -15,6 +16,11 @@ module ContentsCore
     validates :block, presence: true, allow_blank: false
 
     # --- methods -------------------------------------------------------------
+    def on_after_initialize
+      self.data = config[:default] if config[:default] && !self.data
+      self.init
+    end
+
     def as_json( options = nil )
       super( {only: [:id, :name, :type], methods: [:data]}.merge(options || {}) )
     end
@@ -24,11 +30,11 @@ module ContentsCore
     end
 
     def class_name
-      self.class.to_s.split('::').last
+      self.class.to_s.split( '::' ).last
     end
 
     def config
-      @config ||= self.block && self.block.config[:options] && self.name && self.block.config[:options][self.name.to_sym] ? self.block.config[:options][self.name.to_sym] : ( ContentsCore.config[:items][self.class::type_name.to_sym] ? ContentsCore.config[:items][self.class::type_name.to_sym] : {} )
+      @config ||= ( ContentsCore.config[:items] && ContentsCore.config[:items][self.class_name.underscore.to_sym] ? ContentsCore.config[:items][self.class_name.underscore.to_sym] : {} ).merge( self.block && self.block.config[:options] && self.name && self.block.config[:options][self.name.to_sym] ? self.block.config[:options][self.name.to_sym] : {} )
     end
 
     def data_type
@@ -39,17 +45,20 @@ module ContentsCore
       ContentsCore.editing ? " data-ec-item=\"#{self.id}\" data-ec-input=\"#{self.opt_input}\" data-ec-type=\"#{self.class_name}\"".html_safe : ''
     end
 
+    def init  # placeholder method (for override)
+    end
+
     def on_before_create
       # root_block = self.block
       # root_block = root_block.parent while root_block.parent.is_a? Block
       # names = Block.items_keys root_block.tree
       names = ( self.block.items - [self] ).pluck :name
-      if self.name.blank? || names.include?( self.name )
-        t = self.class::type_name
+      if self.name.blank? || names.include?( self.name )  # Search a not used name
+        n = self.name.blank? ? self.class.type_name : self.name
         i = 0
-        while( ( i += 1 ) < 1000 )  # Search an empty group
-          unless names.include? "#{t}-#{i}"
-            self.name = "#{t}-#{i}"
+        while( ( i += 1 ) < 1000 )
+          unless names.include? "#{n}-#{i}"
+            self.name = "#{n}-#{i}"
             break
           end
         end

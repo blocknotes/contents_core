@@ -78,7 +78,7 @@ module ContentsCore
 
     def create_item( item_type, options = {} )
       if ContentsCore.config[:items].keys.include? item_type
-        attrs = { type: "ContentsCore::#{item_type.to_s.classify}" }
+        attrs = { type: "ContentsCore::#{item_type.to_s.classify}" }  # TODO: check if model exists
         attrs[:name] = options[:name]  if options[:name]
         attrs[:data] = options[:value] if options[:value]
         item = self.items.new attrs
@@ -150,11 +150,12 @@ module ContentsCore
 
     def on_before_create
       names = parent.cc_blocks.map( &:name )
-      if self.name.blank? || names.include?( self.name )
+      if self.name.blank? || names.include?( self.name )  # Search a not used name
+        n = self.name.blank? ? block_type : self.name
         i = 0
-        while( ( i += 1 ) < 1000 )  # Search an empty group
-          unless names.include? "#{block_type}-#{i}"
-            self.name = "#{block_type}-#{i}"
+        while( ( i += 1 ) < 1000 )
+          unless names.include? "#{n}-#{i}"
+            self.name = "#{n}-#{i}"
             break
           end
         end
@@ -223,8 +224,7 @@ module ContentsCore
             model = false
           end
           if model
-            item = block.items.new( type: model.name, name: name )
-            item.init
+            block.items.new( type: model.name, name: name )
           end
         elsif Block.types( false ).include? t
           block.create_children.times do

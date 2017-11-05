@@ -3,7 +3,7 @@ module ContentsCore
     alias_attribute :data, :data_datetime
 
     def init
-      self.data = Time.now
+      self.data = Time.now unless self.data
       self
     end
 

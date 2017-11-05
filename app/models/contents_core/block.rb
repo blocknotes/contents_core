@@ -1,33 +1,35 @@
 module ContentsCore
   class Block < ApplicationRecord
-    EMPTY_DATA = OpenStruct.new( { data: '' } )
+    # --- constants -----------------------------------------------------------
+    # EMPTY_DATA = OpenStruct.new( { data: '' } )
 
+    # --- misc ----------------------------------------------------------------
     attr_accessor :create_children
+    serialize :conf, Hash
 
-    # --- fields options ----------------------------------------------------- #
-    serialize :options, JSON
-    serialize :validations, JSON
-
-    # --- relations ---------------------------------------------------------- #
-    belongs_to :parent, polymorphic: true
+    # --- associations --------------------------------------------------------
+    belongs_to :parent, polymorphic: true, touch: true
     has_many :cc_blocks, as: :parent, dependent: :destroy, foreign_key: 'parent_id', class_name: 'Block'
     has_many :items, dependent: :destroy
     accepts_nested_attributes_for :cc_blocks, allow_destroy: true
     accepts_nested_attributes_for :items
 
-    # --- hooks -------------------------------------------------------------- #
+    # --- callbacks -----------------------------------------------------------
+    # after_initialize :on_after_initialize
     before_create :on_before_create
     after_create :on_after_create
 
-    # --- scopes ------------------------------------------------------------- #
+    # --- scopes --------------------------------------------------------------
     default_scope { order( :position ) }
     scope :published, -> { where( published: true ) unless ContentsCore.editing }
     scope :with_nested, -> { includes( :items, cc_blocks: :items ) }
 
-    # --- validations -------------------------------------------------------- #
+    # --- validations ---------------------------------------------------------
     validates_presence_of :block_type, :position
+    validates_associated :cc_blocks
+    validates_associated :items
 
-    # --- misc --------------------------------------------------------------- #
+    # --- tmp -----------------------------------------------------------------
     ## amoeba do
     ##   enable
     ##   # customize( lambda { |original_obj, new_obj|
@@ -53,11 +55,13 @@ module ContentsCore
     #
     # # scope :published, -> { where( published: true ) unless ApplicationController.edit_mode }
 
+    # --- methods -------------------------------------------------------------
     def initialize( attributes = {}, &block )
       super( attributes, &block )
-      @create_children = 1
+      @create_children = 0
+      self.conf = {} unless self.conf
       self.group = config[:group]
-      self.block_type = parent.config[:children_type] if attributes[:block_type].nil? && self.parent_type == 'ContentsCore::Block'
+      self.block_type = parent.config[:new_children] if attributes[:block_type].nil? && self.parent_type == 'ContentsCore::Block'
     end
 
     def as_json( options = nil )
@@ -68,19 +72,21 @@ module ContentsCore
       "#{self.class.to_s.split('::').last}-#{self.id}"
     end
 
-    def children_type
-      config[:children_type]
-    end
-
     def config
-      ContentsCore.config[:cc_blocks][block_type.to_sym] ? ContentsCore.config[:cc_blocks][block_type.to_sym] : {}
+      !self.conf.blank? ? self.conf : ( ContentsCore.config[:blocks][block_type.to_sym] ? ContentsCore.config[:blocks][block_type.to_sym] : {} )
     end
 
-    def create_item( item_type, item_name = nil )
-      new_item = ContentsCore::Item.new( type: item_type )
-      new_item.name = item_name if item_name
-      self.items << new_item
-      new_item
+    def create_item( item_type, options = {} )
+      if ContentsCore.config[:items].keys.include? item_type
+        attrs = { type: "ContentsCore::#{item_type.to_s.classify}" }  # TODO: check if model exists
+        attrs[:name] = options[:name]  if options[:name]
+        attrs[:data] = options[:value] if options[:value]
+        item = self.items.new attrs
+        item.save
+        item
+      else
+        raise "Invalid item type: #{item_type} - check defined items in config"
+      end
     end
 
     def editable
@@ -94,25 +100,27 @@ module ContentsCore
         } :
         {
           'data-ec-block': self.id,
-          'data-ec-container': self.children_type,
+          'data-ec-container': self.new_children,
           'data-ec-ct': self.block_type,
           'data-ec-pub': self.published
         }
       ).map { |k, v| "#{k}=\"#{v}\"" }.join( ' ' ).html_safe : ''
     end
 
-    # Returns an item by name
+    # Returns an item value by name
     def get( name )
       item = get_item( name )
-      item.data if item
+      item && item.is_a?( Item ) ? item.data : nil
     end
 
+    # Returns an item by name
     def get_item( name )
-      unless @_items
-        @_items = {}
-        items.each { |item| @_items[item.name] = item }
+      t = tree
+      name.split( '.' ).each do |tok|
+        return nil unless t[tok]
+        t = t[tok]
       end
-      @_items[name]
+      t
     end
 
     def has_parent?
@@ -124,21 +132,30 @@ module ContentsCore
     end
 
     def is_sub_block?
-      parent.present? && parent_type == 'ContentsCore::Block'
+      self.parent.present? && self.parent.is_a?( Block )
+    end
+
+    def new_children
+      config[:new_children]
     end
 
     def on_after_create
       # TODO: validates type before creation!
-      Block::init_items( self, config[:items] ) if Block::block_types( false ).include?( self.block_type.to_sym )
+      Block.initialize_children( self, config[:children] ) if Block.types( false ).include?( self.block_type.to_sym )
     end
 
+    # def on_after_initialize
+    #   self.conf = {} unless self.conf
+    # end
+
     def on_before_create
-      if self.name.blank?
-        names = parent.cc_blocks.map( &:name )
+      names = parent.cc_blocks.map( &:name )
+      if self.name.blank? || names.include?( self.name )  # Search a not used name
+        n = self.name.blank? ? block_type : self.name
         i = 0
-        while( ( i += 1 ) < 1000 )  # Search an empty group
-          unless names.include? "#{block_type}-#{i}"
-            self.name = "#{block_type}-#{i}"
+        while( ( i += 1 ) < 1000 )
+          unless names.include? "#{n}-#{i}"
+            self.name = "#{n}-#{i}"
             break
           end
         end
@@ -148,14 +165,15 @@ module ContentsCore
     def props
       pieces = {}
 
-      Item::item_types.each do |type|
-        pieces[type.pluralize.to_sym] = []
+      Item.types.each do |type|
+        pieces[type.to_s.pluralize.to_sym] = []
       end
       items.each do |item|  # TODO: improve me
+        pieces[item.class.type_name.pluralize.to_sym] = [] unless pieces[item.class.type_name.pluralize.to_sym]
         pieces[item.class.type_name.pluralize.to_sym].push item
       end
-      Item::item_types.each do |type|
-        pieces[type.to_sym] = pieces[type.pluralize.to_sym].any? ? pieces[type.pluralize.to_sym].first : nil  # EMPTY_DATA - empty Item per sti class?
+      Item.types.each do |type|
+        pieces[type] = pieces[type.pluralize.to_sym].any? ? pieces[type.pluralize.to_sym].first : nil  # EMPTY_DATA - empty Item per sti class?
       end
 
       # pieces = {
@@ -174,44 +192,62 @@ module ContentsCore
     end
 
     def set( name, value )
-      items.each do |item|
-        if item.name == name
-          item.data = value
-          break
-        end
-      end
+      item = get_item( name )
+      item && item.is_a?( Item ) ? item.data = value : nil
     end
 
-    def self.block_enum( include_children = true )
-      ContentsCore.config[:cc_blocks].map{|k, v| [v[:name], k.to_s] if !include_children || !v[:child_only]}.compact.sort_by{|b| b[0]}
+    def tree
+      # return @items_tree if @items_tree
+      @items_tree = {}  # prepare a complete list of items
+      self.items.each{ |item| @items_tree[item.name] = item }
+      self.cc_blocks.each_with_index{ |block, i| @items_tree[block.name] = block.tree }  # @items_tree[i] = block.tree
+      @items_tree
     end
 
-    def self.block_types( include_children = true )
-      ContentsCore.config[:cc_blocks].select{|k, v| !include_children || !v[:child_only]}.keys
+    def validations
+      config[:validations] || {}
     end
 
-    def self.init_items( block, items, options = {} )
-      items.each do |name, type|
+    def self.enum( include_children = true )
+      ContentsCore.config[:blocks].map{|k, v| [I18n.t( 'contents_core.blocks.' + v[:name].to_s ), k.to_s] if !include_children || !v[:child_only]}.compact.sort_by{|b| b[0]}
+    end
+
+    def self.initialize_children( block, children, options = {} )
+      children.each do |name, type|
         t = type.to_sym
-        if type.to_s.start_with? 'item_'
+        if Item.types.include? t
           c = 'ContentsCore::' + ActiveSupport::Inflector.camelize( t )
           begin
             model = c.constantize
           rescue Exception => e
-            Rails.logger.error '[ERROR] ContentsCore - init_items: ' + e.message
+            Rails.logger.error '[ERROR] ContentsCore - initialize_children: ' + e.message
             model = false
           end
-          block.items << model.new( name: name ).init if model
-        elsif Block::block_types( false ).include? t.to_sym
+          if model
+            block.items.new( type: model.name, name: name )
+          end
+        elsif Block.types( false ).include? t
           block.create_children.times do
-            block.cc_blocks << Block.new( block_type: t, name: name )
+            block.cc_blocks.new( block_type: t, name: name )
+            block.save
           end
         end
-      end if items
+      end if children
+      block.save
+    end
+
+    def self.items_keys( keys )
+      keys.map do |k, v|
+        v.is_a?( Hash ) ? items_keys( v ) : k
+      end.flatten
     end
 
     def self.permitted_attributes
       [ :id, :name, :block_type, :position, :_destroy, items_attributes: [ :id ] + Item::permitted_attributes, cc_blocks_attributes: [ :id, :name, :block_type, items_attributes: [ :id ] + Item::permitted_attributes ] ]
+    end
+
+    def self.types( include_children = true )
+      @@types ||= ContentsCore.config[:blocks].select{|k, v| !include_children || !v[:child_only]}.keys.map( &:to_sym )
     end
   end
 end

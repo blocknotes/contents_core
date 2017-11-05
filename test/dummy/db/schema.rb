@@ -14,21 +14,22 @@ ActiveRecord::Schema.define(version: 20171030182924) do
 
   create_table "contents_core_blocks", force: :cascade do |t|
     t.string "block_type", default: "text", null: false
-    t.integer "version", default: 0, null: false
-    t.string "name", default: "", null: false
+    t.string "name"
     t.string "group"
+    t.integer "version", default: 0, null: false
     t.integer "position", default: 0, null: false
     t.boolean "published", default: true, null: false
-    t.string "options", default: "{}", null: false
-    t.string "validations", default: "{}", null: false
+    t.text "conf"
     t.integer "parent_id"
     t.string "parent_type"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["parent_id", "parent_type"], name: "index_contents_core_blocks_on_parent_id_and_parent_type"
   end
 
   create_table "contents_core_items", force: :cascade do |t|
     t.string "type"
-    t.string "name", default: "data", null: false
+    t.string "name"
     t.integer "block_id"
     t.boolean "data_boolean"
     t.datetime "data_datetime"
@@ -38,6 +39,8 @@ ActiveRecord::Schema.define(version: 20171030182924) do
     t.integer "data_integer"
     t.string "data_string"
     t.text "data_text"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["block_id"], name: "index_contents_core_items_on_block_id"
   end
 

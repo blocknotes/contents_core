@@ -16,7 +16,7 @@ module ContentsCore
     end
 
     def init
-      # self.data_file = File.open( ContentsCore::Engine.root.join( 'lib', 'data', 'img1.jpg' ) )
+      # self.data_file = File.open( ContentsCore::Engine.root.join( 'lib', 'data', 'missing.jpg' ) ) unless self.data
       self
     end
 
@@ -31,7 +31,7 @@ module ContentsCore
     # before_validation :on_before_validation
     #
     # def on_before_validation
-    #   self.data = File.open( 'rails/editable_components_test/public/img/img1.jpg' )
+    #   self.data = File.open( 'test/public/img/img1.jpg' )
     #   # binding.pry
     # end
 

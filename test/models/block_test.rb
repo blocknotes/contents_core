@@ -32,18 +32,18 @@ module ContentsCore
       @page.create_block :text, { name: 'A block' }
       block = Block.last
       assert_equal block.name, 'A block'
-      assert_equal block.config[:items], {:title=>:item_string, :content=>:item_text}
+      assert_equal block.config[:children], {title: :item_string, content: :item_text}
     end
 
     test 'should create a slider block without slides' do
-      @page.create_block :slider, { create_children: 0 }
+      @page.create_block :slider
       assert_equal Block.where( block_type: 'slide' ).count, 0
     end
 
     test 'should create a slider block with 3 slides' do
-      block = @page.create_block :slider, { create_children: 3 }
+      block = @page.create_block :slider, create_children: 3
       assert block.has_children?
-      assert block.children_type, :slide
+      assert block.new_children, :slide
       assert_equal Block.where( block_type: 'slide', parent: block ).count, 3
       block = Block.where( block_type: 'slide', parent: block ).last
       assert block.is_sub_block?
@@ -60,11 +60,23 @@ module ContentsCore
       assert_equal Item.count, 2
     end
 
+    test 'should create a text block and initialize it with some values (hash)' do
+      @page.create_block :slider, { create_children: 1, values: {slide: {title: 'A title...'}} }
+      block = Block.last
+      assert_equal block.get( 'slide.title' ), 'A title...'
+    end
+
+    test 'should create a text block and initialize it with some values (hash-list)' do
+      @page.create_block :slider, { create_children: 1, values_list: { 'slide.title' => 'A title...' } }
+      block = Block.last
+      assert_equal block.get( 'slide.title' ), 'A title...'
+    end
+
     test 'should not create a block without parent' do
       assert_not Block.new.save
     end
 
-    # --- Create tests ---
+    # --- Destroy tests ---
     test 'should destroy items' do
       @page.create_block
       assert_equal Block.count, 1
@@ -81,6 +93,16 @@ module ContentsCore
       block.destroy
       assert_equal Block.count, 0
       assert_equal Item.count, 0
+    end
+
+    # --- Access tests ---
+    test 'should get an item of a block by name' do
+      block = @page.create_block :slider, name: 'sld', create_children: 3
+      assert_equal block.get( 'slide.title' ), ''
+      block.set 'slide-2.title', 'A title...'
+      block.save
+      block = Block.last
+      assert_equal block.get( 'slide-2.title' ), 'A title...'
     end
   end
 end

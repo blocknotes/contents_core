@@ -1,18 +1,46 @@
+## Add to 'config.after_initialize do' in 'application.rb'
+#
 # ContentsCore::ItemObject.class_eval do
 #   def data=( value )
 #     self.from_string( value )
 #   end
 # end
+#
+# ContentsCore::ItemFile.class_eval do
+#   mount_uploader :data_file, ImageUploader
+# end
 
-ContentsCore::ItemFile.class_eval do
-  mount_uploader :data_file, ImageUploader
+module Formtastic
+  module Inputs
+    class HashInput < Formtastic::Inputs::StringInput
+      def to_html
+        input_wrapping do
+          # label_html <<
+          object.keys.map do |key|
+            template.content_tag( :div, style: 'clear: both' ) do
+              template.label( object.name, ::I18n.t("activerecord.attributes.contents_core/item.#{object.name}.#{key}") ) <<
+              field_input( object, key )
+            end
+          end.join.html_safe
+        end
+      end
+
+      def field_input( object, key )
+        if object.config[:input] == :html
+          builder.text_area( method, input_html_options.merge({ id: nil, 'data-hash-key': key, value: object.data[key.to_s] }) )
+        else
+          builder.text_field( method, input_html_options.merge({ id: nil, 'data-hash-key': key, value: object.data[key.to_s] }) )
+        end
+      end
+    end
+  end
 end
 
 def data_attrs( object )
   ret = {label: I18n.t("activerecord.attributes.contents_core/item.#{object.name}"), input_html:{'data-cc-class': object.class.to_s}}
   case object.class.to_s
   when 'ContentsCore::ItemArray'
-    ret[:as] = :select
+    ret[:as] = object.is_multiple? ? :check_boxes : :select
     ret[:collection] = object.enum
   when 'ContentsCore::ItemBoolean'
     ret[:as] = :boolean
@@ -22,6 +50,8 @@ def data_attrs( object )
     ret[:hint] = image_tag( object.data.url ) if object.data?
   when 'ContentsCore::ItemFloat', 'ContentsCore::ItemInteger'
     ret[:as] = :number
+  when 'ContentsCore::ItemHash'
+    ret[:as] = :hash
   when 'ContentsCore::ItemText'
     ret[:as] = :ckeditor
   end
@@ -32,7 +62,7 @@ ActiveAdmin.register Page do
   filter :title
   filter :published
 
-  # permit_params do
+  # permit_params do  # TODO: it would be better, but for hash items?
   #   Page.column_names + [ :cc_blocks ] + [
   #     cc_blocks_attributes: [
   #       :id, :name, :block_type, :position, :_destroy, items_attributes: [ :id, :data ],
@@ -89,36 +119,27 @@ ActiveAdmin.register Page do
       frm.input :slug unless frm.object.new_record?
 
       li class: 'block-buttons' do
-        ContentsCore::Block::block_types.each do |type|
-          frm.button "Create #{type}", name: "add_block[#{type}]"
+        ContentsCore::Block.enum.each do |type|
+          frm.button "Crea blocco #{type[0]}", name: "add_block[#{type[1]}]"
         end
       end unless frm.object.new_record?
 
-      frm.has_many :cc_blocks, heading: false, sortable: :position, sortable_start: 1, new_record: 'New block' do |b|
+      frm.has_many :cc_blocks, heading: false, sortable: :position, sortable_start: 1, new_record: false do |b|
         b.input :name if b.object.new_record?
-        b.input :block_type, label: 'Type of block', hint: 'Save changes to edit the new block fields', collection: ContentsCore::Block.block_list, input_html: { 'data-sel': 'items' + b.object.id.to_s } if b.object.new_record?
-        b.has_many :items, heading: b.object.name, new_record: false do |i|
-          if i.object.is_a? ContentsCore::ItemHash
-            i.object.keys.each do |key|
-              i.input :data, as: :string, label: I18n.t("activerecord.attributes.contents_core/item.#{i.object.name}.#{key}"), input_html: {id: nil, 'data-hash-key': key, value: i.object.data[key.to_s]}
-            end
-          else
+        if b.object.new_record?
+          b.input :block_type, label: 'Type of block', hint: 'Save changes to edit the new block fields', collection: ContentsCore::Block.block_enum, input_html: { 'data-sel': 'items' + b.object.id.to_s }
+        else
+          b.has_many :items, heading: b.object.name, new_record: false do |i|
             i.input :data, data_attrs( i.object )
           end
-        end unless b.object.new_record?
-        b.has_many :cc_blocks, heading: false, new_record: b.object.config[:children_type] do |bb|
+        end
+        b.has_many :cc_blocks, heading: false, new_record: b.object.config[:new_children] do |bb|
           bb.input :name if bb.object.new_record?
           bb.has_many :items, heading: bb.object.name, new_record: false do |bi|
-            if bi.object.is_a? ContentsCore::ItemHash
-              bi.object.keys.each do |key|
-                bi.input :data, as: :string, label: I18n.t("activerecord.attributes.contents_core/item.#{bi.object.name}.#{key}"), input_html: {id: nil, 'data-hash-key': key, value: bi.object.data[key.to_s]}
-              end
-            else
-              bi.input :data, data_attrs( bi.object )
-            end
-          end
+            bi.input :data, data_attrs( bi.object )
+          end if bb.object.items.any?
           bb.input :_destroy, label: 'Destroy sub block', required: false, as: :boolean, wrapper_html: { class: 'checkbox-destroy' }
-        end unless b.object.new_record?
+        end if !b.object.new_record? && b.object.config[:new_children]
         b.input :_destroy, label: 'Destroy block', required: false, as: :boolean, wrapper_html: { class: 'checkbox-destroy' } unless b.object.new_record?
       end unless frm.object.new_record?
     end

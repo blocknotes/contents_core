@@ -1,9 +1,10 @@
-Gemfile.lock
 .bundle/
+_misc/
+coverage
+Gemfile.lock
 log/*.log
 pkg/
 test/dummy/db/*.sqlite3
 test/dummy/db/*.sqlite3-journal
 test/dummy/log/*.log
 test/dummy/tmp/
-_misc/

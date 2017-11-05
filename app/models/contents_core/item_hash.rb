@@ -5,7 +5,7 @@ module ContentsCore
     serialize :data_hash, Hash
 
     def init
-      self.data = {}
+      self.data = {} unless self.data
       self
     end
 

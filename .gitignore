@@ -1,5 +1,6 @@
 .bundle/
 _misc/
+coverage
 Gemfile.lock
 log/*.log
 pkg/

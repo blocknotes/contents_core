@@ -25,8 +25,14 @@ module ContentsCore
     end
 
     def method_missing( method, *args, &block )
-      matches = /data_(.+)=/.match method.to_s
-      self.data[matches[1]] = args[0] if matches[1]
+      matches = /data_([^=]+)([=]{0,1})/.match method.to_s
+      if matches
+        if matches[2].blank?
+          return self.data[matches[1].to_sym]
+        elsif matches[1]
+          self.data[matches[1].to_sym] = args[0]
+        end
+      end
     end
 
     def respond_to?( method, include_private = false )
@@ -34,7 +40,7 @@ module ContentsCore
     end
 
     def to_s
-      self.data_hash ? self.data_hash.inject( '' ) { |k, v| k + v[0] + ': ' + v[1] + "\n" } : {}
+      self.data_hash ? self.data_hash.inject( '' ) { |k, v| "#{k}#{v[0]}: #{v[1]}\n" } : {}
     end
 
     def self.permitted_attributes

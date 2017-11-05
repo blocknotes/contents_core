@@ -13,7 +13,7 @@ module ContentsCore
     end
 
     def to_s
-      self.data > 0 ? 'true' : 'false'
+      self.data_boolean ? 'true' : 'false'
     end
 
     def self.permitted_attributes

@@ -55,10 +55,6 @@ module ContentsCore
       config[:multiple] ? true : false
     end
 
-    def to_s
-      self.data
-    end
-
     def self.type_name
       'array'
     end

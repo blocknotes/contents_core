@@ -12,10 +12,6 @@ module ContentsCore
       self.save
     end
 
-    def to_s
-      self.data.to_s
-    end
-
     def self.permitted_attributes
       [ :data_integer ]
     end

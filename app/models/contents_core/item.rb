@@ -85,7 +85,7 @@ module ContentsCore
     end
 
     def to_s
-      self.data
+      self.data.to_s
     end
 
     def update_data( value )

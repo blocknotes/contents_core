@@ -1,4 +1,4 @@
-# ContentsCore [![Gem Version](https://badge.fury.io/rb/contents_core.svg)](https://badge.fury.io/rb/contents_core) [![Build Status](https://travis-ci.org/blocknotes/contents_core.svg)](https://travis-ci.org/blocknotes/contents_core) [![Test Coverage](https://api.codeclimate.com/v1/badges/59196100a1ebb599b088/test_coverage)](https://codeclimate.com/github/blocknotes/contents_core/test_coverage)
+# ContentsCore [![Gem Version](https://badge.fury.io/rb/contents_core.svg)](https://badge.fury.io/rb/contents_core) [![Build Status](https://travis-ci.org/blocknotes/contents_core.svg)](https://travis-ci.org/blocknotes/contents_core) [![Dependency Status](https://gemnasium.com/badges/github.com/blocknotes/contents_core.svg)](https://gemnasium.com/github.com/blocknotes/contents_core) [![Test Coverage](https://api.codeclimate.com/v1/badges/59196100a1ebb599b088/test_coverage)](https://codeclimate.com/github/blocknotes/contents_core/test_coverage)
 
 A Rails gem which offer a structure to manage contents in a flexible way: blocks with recursive nested blocks + items as "leaves"
 

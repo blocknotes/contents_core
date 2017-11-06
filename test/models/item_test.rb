@@ -36,7 +36,14 @@ module ContentsCore
       assert_equal 'array', item.class.type_name
     end
 
-    test 'should create an array item (multiple)' do
+    test 'should create an array item (string value)' do
+      @page.create_block :custom, name: 'a-block', schema: { my_array: :item_array }, conf: { options: { my_array: { data_type: :string, values: [ '1st', '2nd', '3rd' ] } } }
+      item = ContentsCore::ItemArray.last
+      item.data = '1st'
+      assert_equal '1st', item.read_attribute( :data_string )
+    end
+
+    test 'should create an array item (multiple values)' do
       @page.create_block :custom, name: 'a-block', schema: { my_array: :item_array }, conf: { options: { my_array: { multiple: true, values: [ 2, 4, 6, 8 ] } } }
       item = ContentsCore::ItemArray.last
       item.data = [4, 8]
@@ -48,8 +55,8 @@ module ContentsCore
 
     test 'should create an array item with values' do
       @page.create_block :custom, name: 'a-block', schema: { my_array: :item_array }, conf: { options: { my_array: { values: [ [ 'First', 1 ], [ 'Second', 2 ], [ 'Third', 3 ] ] } } }
+      ContentsCore::ItemArray.last.update_data 2
       item = ContentsCore::ItemArray.last
-      item.set 2
       assert_equal [['First', 1], ['Second', 2], ['Third', 3]], item.enum
       assert_equal 2, item.read_attribute( :data_integer )
       assert_equal 2, item.data

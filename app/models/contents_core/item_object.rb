@@ -28,7 +28,7 @@ module ContentsCore
     end
 
     def to_s
-      self.data_hash ? self.data_hash.inject( '' ) { |k, v| k + v[0] + ': ' + v[1] + "\n" } : {}
+      self.data_hash ? self.data_hash.inject( '' ) { |k, v| "#{k}#{v[0]}: #{v[1]}\n" } : {}
     end
 
     def self.permitted_attributes

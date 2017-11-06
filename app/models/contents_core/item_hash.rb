@@ -20,7 +20,7 @@ module ContentsCore
           m = line.match( /([^:]*):(.*)/ )
           val[m[1]] = m[2].strip if m && !m[1].blank?
         end
-        self.data_hash = val
+        self.data_hash = val.symbolize_keys
       end
     end
 

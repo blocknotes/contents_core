@@ -2,7 +2,7 @@
 
 A Rails gem which offer a structure to manage contents in a flexible way: blocks with recursive nested blocks + items as "leaves"
 
-Disclaimer: this component is in ALPHA, major changes could happen
+_Disclaimer: this component is in ALPHA, major changes could happen_
 
 Goals:
 - attach the contents structure to a model transparently

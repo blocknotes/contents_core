@@ -16,12 +16,12 @@ module ContentsCore
         if data_type
           self.data_text = case data_type
             # when :boolean
-            #   self.data_boolean = ( value == 1 ) || ( value == '1' ) || ( value == 'true' ) || ( value == 'yes' )
+            #   self.data_boolean = value  # ( value == 1 ) || ( value == '1' ) || ( value == 'true' ) || ( value == 'yes' )
             when :float
               value.map( &:to_f )
             when :integer
               value.map( &:to_i )
-            when :string, :text
+            when :string  # , :text
               value.map( &:to_s )
             else
               value

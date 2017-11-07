@@ -7,13 +7,17 @@ module ContentsCore
       self
     end
 
+    def from_string( value )
+      self.data = ( value == 1 ) || ( value == '1' ) || ( value == 'true' ) || ( value == 'yes' )
+    end
+
     def update_data( value )
-      self.data = ( value == 'true' ) ? 1 : 0
+      self.data = value
       self.save
     end
 
     def to_s
-      self.data > 0 ? 'true' : 'false'
+      self.data_boolean ? 'true' : 'false'
     end
 
     def self.permitted_attributes

@@ -14,6 +14,7 @@ module ContentsCore
     # --- validations ---------------------------------------------------------
     validate :validate_item
     validates :block, presence: true, allow_blank: false
+    validates :type, presence: true, allow_blank: false
 
     # --- methods -------------------------------------------------------------
     def on_after_initialize
@@ -85,7 +86,7 @@ module ContentsCore
     end
 
     def to_s
-      self.data
+      self.data.to_s
     end
 
     def update_data( value )
@@ -98,7 +99,7 @@ module ContentsCore
     end
 
     def self.permitted_attributes
-      [ :data_boolean, :data_datetime, :data_file, :data_float, :data_hash, :data_integer, :data_string, :data_text ]
+      [:data_boolean, :data_datetime, :data_file, :data_float, :data_hash, :data_integer, :data_string, :data_text]
     end
 
     def self.type_name

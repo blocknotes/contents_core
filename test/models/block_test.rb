@@ -104,5 +104,25 @@ module ContentsCore
       block = Block.last
       assert_equal block.get( 'slide-2.title' ), 'A title...'
     end
+
+    # --- Other tests ---
+    test 'should render to json' do
+      block = @page.create_block :text, name: 'a-text', values: {title: 'A title', content: 'Some content'}
+      json = block.as_json
+      assert json['published']
+      assert_equal json['block_type'], 'text'
+      assert_equal json['name'], 'a-text'
+      assert_equal json['items'][0]['name'], 'title'
+      assert_equal json['items'][0]['data_string'], 'A title'
+      assert_equal json['items'][1]['name'], 'content'
+      assert_equal json['items'][1]['data_text'], 'Some content'
+    end
+
+    test 'should return the block types' do
+      block = @page.create_block :text
+      types = Block.enum.map{|type| type[1]}.sort
+      assert_equal ['image', 'multi_text', 'slide', 'slider', 'text', 'text_with_image'], types
+      assert_equal ['title', 'content'], Block.items_keys( block.tree )
+    end
   end
 end

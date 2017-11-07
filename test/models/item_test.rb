@@ -36,11 +36,16 @@ module ContentsCore
       assert_equal 'array', item.class.type_name
     end
 
-    test 'should create an array item (string value)' do
-      @page.create_block :custom, name: 'a-block', schema: { my_array: :item_array }, conf: { options: { my_array: { data_type: :string, values: [ '1st', '2nd', '3rd' ] } } }
-      item = ContentsCore::ItemArray.last
-      item.data = '1st'
+    test 'should create an array item (with many data types)' do
+      block = @page.create_block :custom, name: 'a-block', schema: { my_array: :item_array }, conf: { options: { my_array: { data_type: :float, values: [ [ 'Price 1', 45.5 ], [ 'Price 2', 39.9 ] ] } } }
+      ( item = block.items.last ).update_data 38.2
+      assert item.read_attribute( :data_float )
+      block = @page.create_block :custom, name: 'a-block', schema: { my_array: :item_array }, conf: { options: { my_array: { data_type: :string, values: [ '1st', '2nd', '3rd' ] } } }
+      ( item = block.items.last ).update_data '1st'
       assert_equal '1st', item.read_attribute( :data_string )
+      # block = @page.create_block :custom, name: 'a-block', schema: { my_array: :item_array }, conf: { options: { my_array: { data_type: :text, values: [ 'One day i found a big book buried deep in the ground...' ] } } }
+      # ( item = block.items.last ).update_data '...'
+      # assert_equal '...', item.read_attribute( :data_text )
     end
 
     test 'should create an array item (multiple values)' do
@@ -67,14 +72,18 @@ module ContentsCore
 
     test 'should create a boolean item' do
       item = @page.create_block.create_item :item_boolean, name: 'an-item'
-      item.set true
-      item.save
+      assert_not item.read_attribute( :data_boolean )
+      item.update_data true
       item = ItemBoolean.find_by name: 'an-item'
       assert item.read_attribute( :data_boolean )
       assert item.data  # test alias
       assert_equal 'true', item.to_s
       assert_equal 'boolean', item.class.type_name
       assert_equal [:data_boolean], item.class.permitted_attributes
+      item.from_string 'false'
+      assert_not item.read_attribute( :data_boolean )
+      item.from_string 'yes'
+      assert item.read_attribute( :data_boolean )
     end
 
     test 'should create a datetime item' do
@@ -105,8 +114,7 @@ module ContentsCore
 
     test 'should create a float item' do
       item = @page.create_block.create_item :item_float, name: 'an-item'
-      item.set 12.34
-      item.save
+      item.update_data 12.34
       item = ItemFloat.find_by name: 'an-item'
       assert_equal 12.34, item.read_attribute( :data_float )
       assert_equal 12.34, item.data  # test alias
@@ -140,8 +148,7 @@ module ContentsCore
       item = ItemInteger.find_by name: 'an-item'
       assert_equal item.read_attribute( :data_integer ), 12
       assert_equal item.data, 12  # test alias
-      item.set 15
-      item.save
+      item.update_data 15
       item = ItemInteger.find_by name: 'an-item'
       assert_equal 15, item.read_attribute( :data_integer )
       assert_equal 15, item.data
@@ -163,20 +170,24 @@ module ContentsCore
     end
 
     test 'should create a string item' do
-      @page.create_block.create_item :item_string, name: 'an-item', value: 'A test string'
-      item = ItemString.find_by name: 'an-item'
+      item = @page.create_block.create_item :item_string, name: 'an-item', value: 'A test string'
       assert_equal 'A test string', item.read_attribute( :data_string )
-      assert_equal 'A test string', item.data  # test alias
-      assert_equal 'A test string', item.to_s
+      item.update_data 'Another string'
+      item = ItemString.find_by name: 'an-item'
+      assert_equal 'Another string', item.read_attribute( :data_string )
+      assert_equal 'Another string', item.data  # test alias
+      assert_equal 'Another string', item.to_s
       assert_equal 'string', item.class.type_name
       assert_equal [:data_string], item.class.permitted_attributes
     end
 
     test 'should create a text item' do
-      @page.create_block.create_item :item_text, name: 'an-item', value: 'Some text'
-      item = ItemText.find_by name: 'an-item'
+      item = @page.create_block.create_item :item_text, name: 'an-item', value: 'Some text'
       assert_equal 'Some text', item.read_attribute( :data_text )
-      assert_equal 'Some text', item.to_s
+      item.update_data 'Another text'
+      item = ItemText.find_by name: 'an-item'
+      assert_equal 'Another text', item.read_attribute( :data_text )
+      assert_equal 'Another text', item.to_s
       assert_equal 'text', item.class.type_name
       assert_equal [:data_text], item.class.permitted_attributes
     end

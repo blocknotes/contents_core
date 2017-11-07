@@ -11,40 +11,40 @@ module ContentsCore
     test 'should create a text block with default options' do
       assert Block.new( parent: @page ).save
       block = Block.last
-      assert_equal block.block_type, 'text'
-      assert_equal block.parent_id, @page.id
-      assert_equal block.parent_type, Page.to_s
-      assert_equal Block.count, 1
-      assert_equal Item.count, 2
+      assert_equal 'text', block.block_type
+      assert_equal @page.id, block.parent_id
+      assert_equal Page.to_s, block.parent_type
+      assert_equal 1, Block.count
+      assert_equal 2, Item.count
     end
 
     test 'should create a text block using create_block' do
       @page.create_block
       block = Block.last
-      assert_equal block.block_type, 'text'
-      assert_equal block.parent_id, @page.id
-      assert_equal block.parent_type, Page.to_s
-      assert_equal Block.count, 1
-      assert_equal Item.count, 2
+      assert_equal 'text', block.block_type
+      assert_equal @page.id, block.parent_id
+      assert_equal Page.to_s, block.parent_type
+      assert_equal 1, Block.count
+      assert_equal 2, Item.count
     end
 
     test 'should create a text block using create_block with name' do
       @page.create_block :text, { name: 'A block' }
       block = Block.last
-      assert_equal block.name, 'A block'
-      assert_equal block.config[:children], {title: :item_string, content: :item_text}
+      assert_equal 'A block', block.name
+      assert_equal( {title: :item_string, content: :item_text}, block.config[:children] )
     end
 
     test 'should create a slider block without slides' do
       @page.create_block :slider
-      assert_equal Block.where( block_type: 'slide' ).count, 0
+      assert_equal 0, Block.where( block_type: 'slide' ).count
     end
 
     test 'should create a slider block with 3 slides' do
       block = @page.create_block :slider, create_children: 3
       assert block.has_children?
-      assert block.new_children, :slide
-      assert_equal Block.where( block_type: 'slide', parent: block ).count, 3
+      assert_equal :slide, block.new_children
+      assert_equal 3, Block.where( block_type: 'slide', parent: block ).count
       block = Block.where( block_type: 'slide', parent: block ).last
       assert block.is_sub_block?
       assert block.has_parent?
@@ -53,23 +53,23 @@ module ContentsCore
     test 'should create a text block using create_block_in_parent' do
       ContentsCore::create_block_in_parent @page
       block = Block.last
-      assert_equal block.block_type, 'text'
-      assert_equal block.parent_id, @page.id
-      assert_equal block.parent_type, Page.to_s
-      assert_equal Block.count, 1
-      assert_equal Item.count, 2
+      assert_equal 'text', block.block_type
+      assert_equal @page.id, block.parent_id
+      assert_equal Page.to_s, block.parent_type
+      assert_equal 1, Block.count
+      assert_equal 2, Item.count
     end
 
     test 'should create a text block and initialize it with some values (hash)' do
       @page.create_block :slider, { create_children: 1, values: {slide: {title: 'A title...'}} }
       block = Block.last
-      assert_equal block.get( 'slide.title' ), 'A title...'
+      assert_equal 'A title...', block.get( 'slide.title' )
     end
 
     test 'should create a text block and initialize it with some values (hash-list)' do
       @page.create_block :slider, { create_children: 1, values_list: { 'slide.title' => 'A title...' } }
       block = Block.last
-      assert_equal block.get( 'slide.title' ), 'A title...'
+      assert_equal 'A title...', block.get( 'slide.title' )
     end
 
     test 'should not create a block without parent' do
@@ -79,30 +79,36 @@ module ContentsCore
     # --- Destroy tests ---
     test 'should destroy items' do
       @page.create_block
-      assert_equal Block.count, 1
-      assert_equal Item.count, 2
+      assert_equal 1, Block.count
+      assert_equal 2, Item.count
       Block.last.destroy
-      assert_equal Block.count, 0
-      assert_equal Item.count, 0
+      assert_equal 0, Block.count
+      assert_equal 0, Item.count
     end
 
     test 'should destroy children blocks' do
       block = @page.create_block :slider, { create_children: 2 }
-      assert_equal Block.count, 3
-      assert_equal Item.count, 4
+      assert_equal 3, Block.count
+      assert_equal 4, Item.count
       block.destroy
-      assert_equal Block.count, 0
-      assert_equal Item.count, 0
+      assert_equal 0, Block.count
+      assert_equal 0, Item.count
     end
 
     # --- Access tests ---
     test 'should get an item of a block by name' do
       block = @page.create_block :slider, name: 'sld', create_children: 3
-      assert_equal block.get( 'slide.title' ), ''
+      assert_empty block.get( 'slide.title' )
       block.set 'slide-2.title', 'A title...'
       block.save
       block = Block.last
-      assert_equal block.get( 'slide-2.title' ), 'A title...'
+      assert_equal 'A title...', block.get( 'slide-2.title' )
+    end
+
+    test 'should get the props of a block' do
+      block = @page.create_block :text
+      assert block.props.strings[0].is_a?( ContentsCore::ItemString )
+      assert block.props.texts[0].is_a?( ContentsCore::ItemText )
     end
 
     # --- Other tests ---
@@ -110,12 +116,12 @@ module ContentsCore
       block = @page.create_block :text, name: 'a-text', values: {title: 'A title', content: 'Some content'}
       json = block.as_json
       assert json['published']
-      assert_equal json['block_type'], 'text'
-      assert_equal json['name'], 'a-text'
-      assert_equal json['items'][0]['name'], 'title'
-      assert_equal json['items'][0]['data_string'], 'A title'
-      assert_equal json['items'][1]['name'], 'content'
-      assert_equal json['items'][1]['data_text'], 'Some content'
+      assert_equal 'text', json['block_type']
+      assert_equal 'a-text', json['name']
+      assert_equal 'title', json['items'][0]['name']
+      assert_equal 'A title', json['items'][0]['data_string']
+      assert_equal 'content', json['items'][1]['name']
+      assert_equal 'Some content', json['items'][1]['data_text']
     end
 
     test 'should return the block types' do

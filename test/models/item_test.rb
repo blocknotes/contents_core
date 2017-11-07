@@ -56,6 +56,16 @@ module ContentsCore
       item = ContentsCore::ItemArray.last
       assert item.is_multiple?
       assert_equal [4, 8], item.data
+      # Data Type: float
+      @page.create_block :custom, name: 'a-block-2', schema: { my_array: :item_array }, conf: { options: { my_array: { multiple: true, data_type: :float } } }
+      item = ContentsCore::ItemArray.last
+      item.data = [4.4, 8.8]
+      assert_equal [4.4, 8.8], item.data
+      # Data Type: string
+      @page.create_block :custom, name: 'a-block-3', schema: { my_array: :item_array }, conf: { options: { my_array: { multiple: true, data_type: :string } } }
+      item = ContentsCore::ItemArray.last
+      item.data = ['', 'test']
+      assert_equal ['', 'test'], item.data
     end
 
     test 'should create an array item with values' do

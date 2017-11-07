@@ -117,7 +117,7 @@ module ContentsCore
       if data_type
         case data_type
         when :boolean
-          self.data_boolean = ( value == 1 ) || ( value == '1' ) || ( value == 'true' ) || ( value == 'yes' )
+          self.data_boolean = value.is_a? TrueClass
         when :float
           self.data_float = value.to_f
         when :integer

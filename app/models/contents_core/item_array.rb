@@ -44,7 +44,7 @@ module ContentsCore
 
     def init
       unless self.data
-        self.data_string = []
+        # self.data_string = []
         self.data_hash = []
         self.data_text = []
       end

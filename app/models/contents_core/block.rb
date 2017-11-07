@@ -173,7 +173,7 @@ module ContentsCore
         pieces[item.class.type_name.pluralize.to_sym].push item
       end
       Item.types.each do |type|
-        pieces[type] = pieces[type.pluralize.to_sym].any? ? pieces[type.pluralize.to_sym].first : nil  # EMPTY_DATA - empty Item per sti class?
+        pieces[type.to_s] = pieces[type.to_s.pluralize.to_sym].any? ? pieces[type.to_s.pluralize.to_sym].first : nil  # EMPTY_DATA - empty Item per sti class?
       end
 
       # pieces = {

@@ -1,0 +1,74 @@
+<%
+def traverse_items( tree, ret = '' )
+  tree.each do |k, v|
+    if v.is_a?( ContentsCore::Item )
+      ret += "<div class=\"item #{v.class.type_name} #{k}\">#{v.data}</div>"
+    else
+      traverse_items( v, ret )
+    end
+  end
+  ret
+end
+%>
+
+<p id="notice"><%= notice %></p>
+
+<%# binding.pry %>
+
+<%# ActionView::Helpers::Tags::TextField.new( :page, :title, {} ).render %>
+
+<%# form_for @page do |form| %>
+  <%# form.text_field :title %>
+  <%# form.submit %>
+<%# end %>
+
+<%#
+# options = {}
+# object_name = model_name_from_record_or_class( @page ).param_key
+# fb = instantiate_builder(object_name, @page, options)
+# fb.hidden_field :title
+#
+# fb2 = instantiate_builder(:author, @page.author, options)
+# fb2.hidden_field :name
+%>
+
+<%# form = instantiate_builder( @page.model_name.param_key, @page, {} ) %>
+<%# binding.pry %>
+
+<p>
+  <strong>Title:</strong>
+  <span<%#= @page.editable path: [ :title ] %>><%= @page.title %></span>
+</p>
+
+<p>
+  <strong>Description:</strong>
+  <span<%#= @page.editable path: [ :description ] %>><%== @page.description %></span>
+</p>
+
+<%# binding.pry %>
+<%# page_cc_blocks_attributes_0_items_attributes_1_data %>
+
+<p>
+  <strong>Blocks:</strong>
+  <div id="blocks">
+    <% @page.current_blocks.each_with_index do |block, index| %>
+      <%== traverse_items( block.tree ) %>
+      <%# @page.editable path: [ :cc_blocks, index, :id ], value: block.id %>
+      <%# block.items.each_with_index do |item, index2| %>
+        <%# @page.editable path: [ :cc_blocks, index, :items, index2, :id ], value: item.id %>
+        <div<%#= @page.editable path: [ :cc_blocks, index, :items, index2, "data_#{item.class.type_name}" ] %>><%#= item.data %></div>
+      <%# end %>
+    <% end %>
+  </div>
+</p>
+
+<%# render partial: 'contents_core/blocks', locals: { container: @page } %>
+
+<%#= link_to 'Edit', edit_page_path(@page) %> |
+<%= link_to 'Back', pages_path %>
+
+<%#= render partial: 'contents_editable/admin', locals: { instance: @page } %>
+
+<%# ActionView::Helpers::Tags::HiddenField.new( :page, :id, {} ) %>
+<%# add_default_name_and_id %>
+<%# options["name"] %>

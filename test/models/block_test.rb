@@ -111,6 +111,10 @@ module ContentsCore
       assert block.props.texts[0].is_a?( ContentsCore::ItemText )
     end
 
+    test 'should get the permitted attributes of a block' do
+      assert [ :id, :name, :block_type, :position, :_destroy, items_attributes: [ :id ] + Item::permitted_attributes, cc_blocks_attributes: [ :id, :name, :block_type, items_attributes: [ :id ] + Item::permitted_attributes ] ], Block.permitted_attributes
+    end
+
     # --- Other tests ---
     test 'should render to json' do
       block = @page.create_block :text, name: 'a-text', values: {title: 'A title', content: 'Some content'}

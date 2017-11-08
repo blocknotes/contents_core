@@ -56,15 +56,23 @@ module ContentsCore
       item = ContentsCore::ItemArray.last
       assert item.is_multiple?
       assert_equal [4, 8], item.data
+      # Data Type: boolean
+      @page.create_block :custom, name: 'a-block-1', schema: { my_array: :item_array }, conf: { options: { my_array: { multiple: true, data_type: :boolean } } }
+      item = ContentsCore::ItemArray.last
+      item.data =  [true, false, false, true]
+      assert_equal [true, false, false, true], item.read_attribute( :data_text )
+      assert_equal [true, false, false, true], item.data
       # Data Type: float
       @page.create_block :custom, name: 'a-block-2', schema: { my_array: :item_array }, conf: { options: { my_array: { multiple: true, data_type: :float } } }
       item = ContentsCore::ItemArray.last
-      item.data = [4.4, 8.8]
+      item.data =  [4.4, 8.8]
+      assert_equal [4.4, 8.8], item.read_attribute( :data_text )
       assert_equal [4.4, 8.8], item.data
       # Data Type: string
       @page.create_block :custom, name: 'a-block-3', schema: { my_array: :item_array }, conf: { options: { my_array: { multiple: true, data_type: :string } } }
       item = ContentsCore::ItemArray.last
-      item.data = ['', 'test']
+      item.data =  ['', 'test']
+      assert_equal ['', 'test'], item.read_attribute( :data_text )
       assert_equal ['', 'test'], item.data
     end
 

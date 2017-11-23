@@ -1,10 +1,12 @@
 <%
 def traverse_items( tree, ret = '' )
   tree.each do |k, v|
-    if v.is_a?( ContentsCore::Item )
-      ret += "<div class=\"item #{v.class.type_name} #{k}\">#{v.data}</div>"
+    ret += if v.is_a?( ContentsCore::Item )
+      r = "<div class=\"item #{v.class.type_name} #{k}\">#{v.data}</div>"
+      r
     else
-      traverse_items( v, ret )
+      r = "<div class=\"block #{k}\">" + traverse_items( v, ret ) + "</div>"
+      r
     end
   end
   ret
@@ -52,6 +54,7 @@ end
   <strong>Blocks:</strong>
   <div id="blocks">
     <% @page.current_blocks.each_with_index do |block, index| %>
+
       <%== traverse_items( block.tree ) %>
       <%# @page.editable path: [ :cc_blocks, index, :id ], value: block.id %>
       <%# block.items.each_with_index do |item, index2| %>

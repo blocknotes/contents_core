@@ -254,12 +254,12 @@ module ContentsCore
     end
 
     # --- Other tests ---
-    # test 'should render to json' do
-    #   item = @page.create_block.create_item :item_text, name: 'an-item', value: 'Some text'
-    #   json = item.as_json
-    #   json.delete 'id'
-    #   assert_equal( {'type' => 'ContentsCore::ItemText', 'name' => 'an-item', 'data' => 'Some text'}, json )
-    # end
+    test 'should render to json' do
+      item = @page.create_block.create_item :item_text, name: 'an-item', value: 'Some text'
+      json = item.as_json
+      json.delete 'id'
+      assert_equal( {'type' => 'ContentsCore::ItemText', 'name' => 'an-item', 'data' => 'Some text'}, json )
+    end
 
     test 'should return attr_id, class_name, data_type, permitted_attributes, type_name' do
       item = @page.create_block.create_item :item_text, name: 'an-item', value: 'Some text'

@@ -105,18 +105,16 @@ module ContentsCore
     end
 
     # --- Other tests ---
-    # test 'should render to json' do
-    #   block = @page.create_block :text, name: 'a-text', values: {title: 'A title', content: 'Some content'}
-    #   json = block.as_json
-    #   assert json['published']
-    #   assert_equal 'text', json['block_type']
-    #   assert_equal 'a-text', json['name']
-    #   assert_equal 'title', json['items'][0]['name']
-    #   # binding.pry
-    #   assert_equal 'A title', json['items'][0]['name']
-    #   assert_equal 'content', json['items'][1]['name']
-    #   assert_equal 'Some content', json['items'][1]['data_text']
-    # end
+    test 'should render to json' do
+      block = @page.create_block :text, name: 'a-text', values: {title: 'A title', content: 'Some content'}
+      json = block.as_json
+      assert json['published']
+      assert_equal 'text', json['block_type']
+      assert_equal 'a-text', json['name']
+      assert_equal 'title', json['items'][0]['name']
+      assert_equal 'A title', json['items'][0]['data']
+      assert_equal 'Some content', json['items'][1]['data']
+    end
 
     test 'should return the block types' do
       @page.create_block :text

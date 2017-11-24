@@ -40,7 +40,7 @@ module ContentsCore
     end
 
     def as_json( options = nil )
-      super( {only: [:id, :name, :type], methods: [:data]}.merge(options || {}) )
+      super( {only: [:id, :name], methods: [:data, :type]}.merge( options || {} ) )
     end
 
     def attr_id

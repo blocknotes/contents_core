@@ -23,8 +23,8 @@ module ContentsCore
     # has_many :cc_blocks, as: :parent, dependent: :destroy, foreign_key: 'parent_id', class_name: 'ContentsCore::Block'
     ## embeds_many :cc_blocks, cascade_callbacks: true, order: :position.desc, class_name: 'ContentsCore::Block'
     # has_many :items, dependent: :destroy, class_name: 'ContentsCore::Item'
-    embeds_many :items, cascade_callbacks: true, class_name: Item.to_s
 
+    embeds_many :items, cascade_callbacks: true, class_name: Item.to_s
     embeds_many :cc_blocks, cascade_callbacks: true, order: :position.desc, class_name: Block.to_s, cyclic: true
     embedded_in :parent, polymorphic: true, cyclic: true
 
@@ -53,24 +53,6 @@ module ContentsCore
     ##   # })
     ## end
 
-    # after_validation :on_after_validation
-    #
-    # field :block_type, type: String, default: 'text'
-    # field :name, type: String, default: ''
-    # field :position, type: Integer, default: 0
-    # field :published, type: Mongoid::Boolean, default: true
-    # field :_init, type: Mongoid::Boolean, default: false
-    #
-    # embedded_in :parent, polymorphic: true
-    #
-    # embeds_many :cc_blocks, cascade_callbacks: true, order: :position.desc, class_name: 'ContentsCore::Block'
-    # embeds_many :items, cascade_callbacks: true, class_name: 'ContentsCore::Item'
-    #
-    # accepts_nested_attributes_for :cc_blocks, allow_destroy: true
-    # accepts_nested_attributes_for :items
-    #
-    # # scope :published, -> { where( published: true ) unless ApplicationController.edit_mode }
-
     # --- methods -------------------------------------------------------------
     def initialize( attributes = {}, &block )
       super( attributes, &block )
@@ -81,7 +63,7 @@ module ContentsCore
     end
 
     def as_json( options = nil )
-      super({ only: [:id, :block_type, :name, :group, :position, :published], include: [:cc_blocks, :items]}.merge(options || {}))
+      super( { include: { items: { only: [ :_id, :name ], methods: [ :data, :data_type ] } } }.merge( options || {} ) )
     end
 
     def attr_id

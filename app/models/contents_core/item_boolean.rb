@@ -1,5 +1,7 @@
 module ContentsCore
   class ItemBoolean < Item
+    field :data_boolean, type: Boolean
+
     alias_attribute :data, :data_boolean
 
     def init

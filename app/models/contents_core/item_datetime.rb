@@ -1,5 +1,7 @@
 module ContentsCore
   class ItemDatetime < Item
+    field :data_datetime, type: DateTime
+
     alias_attribute :data, :data_datetime
 
     def init

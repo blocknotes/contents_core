@@ -1,7 +1,10 @@
 module ContentsCore
   class ItemArray < Item
-    serialize :data_hash, Array
-    serialize :data_text, Array
+    field :data_integer, type: Integer
+    field :data_float, type: Float
+    field :data_string, type: String
+    field :data_hash, type: Array
+    field :data_text, type: Array
 
     # after_initialize do
     #   config[:data_type] ||= :integer  # TODO: this overrides the config !
@@ -35,21 +38,22 @@ module ContentsCore
     end
 
     def data_type
-      @data_type ||= ( config[:data_type] || :integer ).to_sym
+      # @data_type ||=
+      ( config[:data_type] || :integer ).to_sym
     end
 
     def enum( params = nil )
       config[:values] ? config[:values] : ( config[:values_method] ? config[:values_method].call( params ) : self.data_hash )
     end
 
-    def init
-      unless self.data
-        # self.data_string = []
-        self.data_hash = []
-        self.data_text = []
-      end
-      self
-    end
+    # def init
+    #   unless self.data
+    #     # self.data_string = []
+    #     # self.data_hash = []
+    #     # self.data_text = []
+    #   end
+    #   self
+    # end
 
     def is_multiple?
       config[:multiple] ? true : false

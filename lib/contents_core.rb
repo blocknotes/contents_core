@@ -8,6 +8,7 @@ module ContentsCore
   end
 
   def self.create_block_in_parent( parent, type = :text, params = {} )
+    return nil unless parent
     block = Block.new( block_type: type )
     block.name = params[:name] if params[:name]
     block.conf = params[:conf] if params[:conf]

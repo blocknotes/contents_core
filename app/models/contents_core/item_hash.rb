@@ -1,8 +1,27 @@
 module ContentsCore
   class ItemHash < Item
-    alias_attribute :data, :data_hash
+    field :data_hash, type: Hash
 
-    serialize :data_hash, Hash
+    # def get_data
+    #   self.data_hash.deep_symbolize_keys if self.data_hash
+    # end
+
+    # alias :data :get_data
+    alias :data= :data_hash=
+    # alias_attribute :data, :data_hash
+
+    def data
+      self.data_hash.deep_symbolize_keys if self.data_hash
+    end
+
+    # def []=(key,val)
+    #   binding.pry
+    # end
+
+    # def data=( value )
+    #   # binding.pry
+    #   self.data_hash = value ? value : {}
+    # end
 
     def init
       self.data = {} unless self.data
@@ -10,7 +29,7 @@ module ContentsCore
     end
 
     def keys
-      config[:keys] ? config[:keys] : self.data_hash.keys
+      config[:keys] ? config[:keys] : self.data_hash.keys.map( &:to_sym )
     end
 
     def from_string( value )
@@ -30,7 +49,7 @@ module ContentsCore
         if matches[2].blank?
           return self.data[matches[1].to_sym]
         elsif matches[1]
-          self.data[matches[1].to_sym] = args[0]
+          self.data_hash[matches[1].to_s] = args[0]
         end
       end
     end

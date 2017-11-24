@@ -1,5 +1,7 @@
 module ContentsCore
   class ItemText < Item
+    field :data_text, type: String
+
     alias_attribute :data, :data_text
 
     def init

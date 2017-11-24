@@ -5,14 +5,28 @@ module ContentsCore
 
     # --- misc ----------------------------------------------------------------
     attr_accessor :create_children
-    serialize :conf, Hash
+
+    field :block_type, type: String, default: 'text'
+    field :name, type: String
+    field :group, type: String
+    field :version, type: Integer, default: 0
+    field :position, type: Integer, default: 0
+    field :published, type: Boolean, default: true
+    field :conf, type: Hash
+    field :parent_id, type: Integer
+    field :parent_type, type: String
+    # t.timestamps null: false
 
     # --- associations --------------------------------------------------------
-    belongs_to :parent, polymorphic: true, touch: true
-    has_many :cc_blocks, as: :parent, dependent: :destroy, foreign_key: 'parent_id', class_name: 'Block'
-    has_many :items, dependent: :destroy
-    accepts_nested_attributes_for :cc_blocks, allow_destroy: true
-    accepts_nested_attributes_for :items
+    ## belongs_to :parent, polymorphic: true, touch: true
+    # embedded_in :parent, polymorphic: true
+    # has_many :cc_blocks, as: :parent, dependent: :destroy, foreign_key: 'parent_id', class_name: 'ContentsCore::Block'
+    ## embeds_many :cc_blocks, cascade_callbacks: true, order: :position.desc, class_name: 'ContentsCore::Block'
+    # has_many :items, dependent: :destroy, class_name: 'ContentsCore::Item'
+    embeds_many :items, cascade_callbacks: true, class_name: Item.to_s
+
+    embeds_many :cc_blocks, cascade_callbacks: true, order: :position.desc, class_name: Block.to_s, cyclic: true
+    embedded_in :parent, polymorphic: true, cyclic: true
 
     # --- callbacks -----------------------------------------------------------
     # after_initialize :on_after_initialize
@@ -20,7 +34,7 @@ module ContentsCore
     after_create :on_after_create
 
     # --- scopes --------------------------------------------------------------
-    default_scope { order( :position ) }
+    # default_scope { order( :position ) }  # TODO: fix me
     scope :published, -> { where( published: true ) unless ContentsCore.editing }
     scope :with_nested, -> { includes( :items, cc_blocks: :items ) }
 
@@ -28,6 +42,8 @@ module ContentsCore
     validates_presence_of :block_type, :position
     validates_associated :cc_blocks
     validates_associated :items
+    accepts_nested_attributes_for :cc_blocks, allow_destroy: true
+    accepts_nested_attributes_for :items
 
     # --- tmp -----------------------------------------------------------------
     ## amoeba do
@@ -61,7 +77,7 @@ module ContentsCore
       @create_children = 0
       self.conf = {} unless self.conf
       self.group = config[:group]
-      self.block_type = parent.config[:new_children] if attributes[:block_type].nil? && self.parent_type == 'ContentsCore::Block'
+      self.block_type = parent.config[:new_children] if parent && attributes[:block_type].nil? && self.parent_type == Block.to_s
     end
 
     def as_json( options = nil )
@@ -78,11 +94,14 @@ module ContentsCore
 
     def create_item( item_type, options = {} )
       if ContentsCore.config[:items].keys.include? item_type
-        attrs = { type: "ContentsCore::#{item_type.to_s.classify}" }  # TODO: check if model exists
+        type = "ContentsCore::#{item_type.to_s.classify}"
+        model = type.constantize
+        # attrs = { type: "ContentsCore::#{item_type.to_s.classify}" }  # TODO: check if model exists
+        attrs = {}
         attrs[:name] = options[:name]  if options[:name]
         attrs[:data] = options[:value] if options[:value]
-        item = self.items.new attrs
-        item.save
+        item = model.new( attrs )
+        self.items << item
         item
       else
         raise "Invalid item type: #{item_type} - check defined items in config"
@@ -149,7 +168,8 @@ module ContentsCore
     # end
 
     def on_before_create
-      names = parent.cc_blocks.map( &:name )
+      # names = parent.cc_blocks.map( &:name )
+      names = ( self.parent.cc_blocks - [self] ).pluck :name
       if self.name.blank? || names.include?( self.name )  # Search a not used name
         n = self.name.blank? ? block_type : self.name
         i = 0
@@ -200,6 +220,7 @@ module ContentsCore
       # return @items_tree if @items_tree
       @items_tree = {}  # prepare a complete list of items
       self.items.each{ |item| @items_tree[item.name] = item }
+      # binding.pry
       self.cc_blocks.each_with_index{ |block, i| @items_tree[block.name] = block.tree }  # @items_tree[i] = block.tree
       @items_tree
     end
@@ -224,11 +245,13 @@ module ContentsCore
             model = false
           end
           if model
-            block.items.new( type: model.name, name: name )
+            # block.items.new( type: model.name, name: name )
+            block.items << model.new( type: model.name, name: name )
           end
         elsif Block.types( false ).include? t
           block.create_children.times do
-            block.cc_blocks.new( block_type: t, name: name )
+            # block.cc_blocks.new( parent: block, block_type: t, name: name )
+            block.cc_blocks << Block.new( parent: block, block_type: t, name: name )
             block.save
           end
         end

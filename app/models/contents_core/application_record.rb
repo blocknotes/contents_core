@@ -1,5 +1,5 @@
 module ContentsCore
-  class ApplicationRecord < ActiveRecord::Base
-    self.abstract_class = true
+  class ApplicationRecord
+    include Mongoid::Document
   end
 end

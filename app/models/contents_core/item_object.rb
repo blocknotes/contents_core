@@ -1,7 +1,9 @@
 # TODO: needs improvements
 module ContentsCore
   class ItemObject < Item
-    serialize :data_hash, JSON
+    field :data_hash, type: Hash
+
+    # alias_attribute :data, :data_hash
 
     def data
       self.data_hash.deep_symbolize_keys

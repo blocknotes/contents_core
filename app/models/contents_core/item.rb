@@ -1,7 +1,25 @@
 module ContentsCore
   class Item < ApplicationRecord
+    # field :type, type: String
+    field :name, type: String
+
+    # field :block_id, type: Integer
+    # field :data_boolean, type: Boolean
+    # field :data_datetime, type: DateTime
+    # field :data_file, type: String
+    # field :data_float, type: Float
+    # field :data_hash, type: Hash
+    # field :data_integer, type: Integer
+    # field :data_string, type: String
+    # field :data_text, type: String
+    # t.timestamps null: false
+    embedded_in :block
+    # embedded_in :cc_blocks
+
+    alias_attribute :type, :_type
+
     # --- associations --------------------------------------------------------
-    belongs_to :block, touch: true
+    # belongs_to :block, touch: true
 
     # --- callbacks -----------------------------------------------------------
     after_initialize :on_after_initialize
@@ -9,12 +27,11 @@ module ContentsCore
 
     # --- misc ----------------------------------------------------------------
     # field :data, type: String
-    # embedded_in :cc_blocks
 
     # --- validations ---------------------------------------------------------
     validate :validate_item
     validates :block, presence: true, allow_blank: false
-    validates :type, presence: true, allow_blank: false
+    # validates :type, presence: true, allow_blank: false
 
     # --- methods -------------------------------------------------------------
     def on_after_initialize
@@ -35,11 +52,13 @@ module ContentsCore
     end
 
     def config
-      @config ||= ( ContentsCore.config[:items] && ContentsCore.config[:items][self.class_name.underscore.to_sym] ? ContentsCore.config[:items][self.class_name.underscore.to_sym] : {} ).merge( self.block && self.block.config[:options] && self.name && self.block.config[:options][self.name.to_sym] ? self.block.config[:options][self.name.to_sym] : {} )
+      # @config ||=
+      ( ContentsCore.config[:items] && ContentsCore.config[:items][self.class_name.underscore.to_sym] ? ContentsCore.config[:items][self.class_name.underscore.to_sym] : {} ).merge( self.block && self.block.config[:options] && self.name && self.block.config[:options][self.name.to_sym] ? self.block.config[:options][self.name.to_sym] : {} ).deep_symbolize_keys
     end
 
     def data_type
-      @data_type ||= ( config[:data_type] || :string ).to_sym
+      # @data_type ||=
+      ( config[:data_type] || :string ).to_sym
     end
 
     def editable

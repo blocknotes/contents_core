@@ -3,8 +3,8 @@ module ContentsCore
     extend ActiveSupport::Concern
 
     included do
-      # embeds_many :cc_blocks, as: :parent, cascade_callbacks: true, order: :position.desc, class_name: 'ContentsCore::Block'
-      has_many :cc_blocks, as: :parent, dependent: :destroy, foreign_key: 'parent_id', class_name: Block.to_s
+      embeds_many :cc_blocks, as: :parent, cascade_callbacks: true, order: :position.desc, class_name: Block.to_s  # , cyclic: true
+      # has_many :cc_blocks, as: :parent, dependent: :destroy, foreign_key: 'parent_id', class_name: Block.to_s
       accepts_nested_attributes_for :cc_blocks, allow_destroy: true
 
       def create_block( type = :text, params = {} )
@@ -29,7 +29,7 @@ module ContentsCore
       protected
 
         def blocks_cache_key
-          self.cc_blocks.published.select( :updated_at ).order( updated_at: :desc ).first.try( :updated_at ).to_i
+          self.cc_blocks.published.order( updated_at: :desc ).limit( 1 ).pluck( :updated_at ).try( :updated_at ).to_i
         end
     end
   end

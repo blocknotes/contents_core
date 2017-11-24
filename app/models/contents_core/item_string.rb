@@ -1,5 +1,7 @@
 module ContentsCore
   class ItemString < Item
+    field :data_string, type: String
+
     alias_attribute :data, :data_string
 
     # validate :on_validate

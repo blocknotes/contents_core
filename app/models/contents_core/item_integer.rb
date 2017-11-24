@@ -1,5 +1,7 @@
 module ContentsCore
   class ItemInteger < Item
+    field :data_integer, type: Integer
+
     alias_attribute :data, :data_integer
 
     def init

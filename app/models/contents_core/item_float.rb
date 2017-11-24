@@ -1,5 +1,7 @@
 module ContentsCore
   class ItemFloat < Item
+    field :data_float, type: Float
+
     alias_attribute :data, :data_float
 
     def init

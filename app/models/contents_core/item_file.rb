@@ -9,6 +9,8 @@ module ContentsCore
 
     # mount_uploader :data_file, ::FileUploader
 
+    field :data_file, type: String
+
     alias_attribute :data, :data_file
 
     def editable

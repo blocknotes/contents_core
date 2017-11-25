@@ -171,9 +171,8 @@ module ContentsCore
       assert_equal ItemHash.to_s, item.type
       assert_equal 'hash', item.class.type_name
       assert item.respond_to?( :data_a_key )
-      # TODO: !!! item.data[:a_key] = 123 !!! NOT WORKING
       # assert_equal v, item.read_attribute( :data_hash )
-      assert_equal v, item.data  # test alias
+      assert_equal v, item.data.deep_symbolize_keys  # test alias
       assert_equal [:a_key, :another_key], item.keys
       assert_equal 'A value', item.data_a_key
       item.data_a_key = '***'
@@ -181,7 +180,11 @@ module ContentsCore
       assert_equal [:data_hash], item.class.permitted_attributes
       item.from_string "key_1: aaa\nkey_2: bbb"
       assert_equal "key_1: aaa\nkey_2: bbb\n", item.to_s
-      assert_equal( { key_1: 'aaa', key_2: 'bbb' }, item.data )
+      assert_equal( { 'key_1' => 'aaa', 'key_2' => 'bbb' }, item.data )
+      item.data['key_1'] = 123
+      item.save
+      item = Page.last.cc_blocks.last.items.find_by name: 'an-item'
+      assert_equal 123, item.data_key_1
     end
 
     test 'should create an integer item' do

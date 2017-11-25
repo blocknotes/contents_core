@@ -6,13 +6,14 @@ module ContentsCore
     #   self.data_hash.deep_symbolize_keys if self.data_hash
     # end
 
-    # alias :data :get_data
-    alias :data= :data_hash=
-    # alias_attribute :data, :data_hash
+    alias_attribute :data, :data_hash
 
-    def data
-      self.data_hash.deep_symbolize_keys if self.data_hash
-    end
+    # alias :data :get_data
+    # alias :data= :data_hash=
+
+    # def data
+    #   self.data_hash.deep_symbolize_keys if self.data_hash
+    # end
 
     # def []=(key,val)
     #   binding.pry

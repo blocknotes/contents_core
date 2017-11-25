@@ -59,7 +59,7 @@ module ContentsCore
       @create_children = 0
       self.conf = {} unless self.conf
       self.group = config[:group]
-      self.block_type = parent.config[:new_children] if parent && attributes[:block_type].nil? && self.parent_type == Block.to_s
+      self.block_type = parent.config[:new_children].to_sym if parent && attributes[:block_type].nil? && self.parent_type == Block.to_s
     end
 
     def as_json( options = nil )

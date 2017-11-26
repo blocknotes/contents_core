@@ -151,7 +151,7 @@ module ContentsCore
 
     def on_before_create
       # names = parent.cc_blocks.map( &:name )
-      names = ( self.parent.cc_blocks - [self] ).pluck :name
+      names = self.parent ? ( self.parent.cc_blocks - [self] ).pluck( :name ) : []
       if self.name.blank? || names.include?( self.name )  # Search a not used name
         n = self.name.blank? ? block_type : self.name
         i = 0
@@ -234,7 +234,7 @@ module ContentsCore
           block.create_children.times do
             # block.cc_blocks.new( parent: block, block_type: t, name: name )
             block.cc_blocks << Block.new( parent: block, block_type: t, name: name )
-            block.save
+            # block.save
           end
         end
       end if children

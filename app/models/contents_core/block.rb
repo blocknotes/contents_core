@@ -202,7 +202,6 @@ module ContentsCore
       # return @items_tree if @items_tree
       @items_tree = {}  # prepare a complete list of items
       self.items.each{ |item| @items_tree[item.name] = item }
-      # binding.pry
       self.cc_blocks.each_with_index{ |block, i| @items_tree[block.name] = block.tree }  # @items_tree[i] = block.tree
       @items_tree
     end
@@ -238,7 +237,7 @@ module ContentsCore
           end
         end
       end if children
-      block.save
+      # block.save
     end
 
     def self.items_keys( keys )

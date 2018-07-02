@@ -32,7 +32,7 @@ page.current_blocks.map{ |block| block.name }  # current_blocks -> all published
 block = page.get_block 'a-slider'
 block.tree  # list all items of a block
 block.get 'slide-2.title'  # get value of 'title' field of sub block with name 'slide-2' (name automatically generated at creation)
-block.set 'slide-2.title'  # set field value
+block.set 'slide-2.title', 'A title'  # set field value
 block.save
 ```
 
